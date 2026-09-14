@@ -1134,55 +1134,6 @@
       ],
       "id": "use",
       "title": "설치와 사용"
-    },
-    {
-      "blocks": [
-        {
-          "items": [
-            {
-              "as_of": "2026-09-09",
-              "name": "IR 규칙 테스트",
-              "path": "engine/tests/test_ir.py",
-              "rows": 25
-            },
-            {
-              "as_of": "2026-09-09",
-              "name": "humanize 불변식 테스트",
-              "path": "engine/tests/test_humanize_io.py",
-              "rows": 11
-            },
-            {
-              "as_of": "2026-09-09",
-              "name": "매니페스트 규칙 테스트",
-              "path": "engine/tests/test_manifest.py",
-              "rows": 22
-            },
-            {
-              "as_of": "2026-09-09",
-              "name": "golden HTML",
-              "path": "standard/examples/golden/rnr.html",
-              "rows": 69893
-            },
-            {
-              "as_of": "2026-09-09",
-              "name": "예제 IR (실제 R&R 워크북 파생)",
-              "path": "standard/examples/rnr.example.somdoc.json",
-              "rows": 13,
-              "sheet": "12 sections"
-            },
-            {
-              "as_of": "2026-09-09",
-              "name": "엔진 코드",
-              "path": "engine/**/*.py",
-              "rows": 7209
-            }
-          ],
-          "note": "이 문서의 모든 수치는 빌드 시점에 아래에서 측정했다.",
-          "type": "appendix_source"
-        }
-      ],
-      "id": "sources",
-      "title": "부록 — 측정 원천"
     }
   ],
   "theme": "console"

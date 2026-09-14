@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "SOM unit work orchestration for Claude Code — stage-gated multi-agent runs on the Orca CLI, a validated document standard for R&R / KPI / team-charter deliverables, and Snowflake access that runs reads and asks before writes.",
-    "version": "0.2.1"
+    "version": "0.2.2"
   },
   "plugins": [
     {
       "name": "som",
       "source": "./som",
       "description": "Stage-gated orchestration (INTAKE -> BLUEPRINT -> EXECUTE -> ATTEST -> DELIVER) with wave scheduling, autonomy levels, the SOM Doc Standard, and a Snowflake guard that runs reads and asks before writes. Deliverables are local files.",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "category": "workflow",
       "keywords": ["orca", "multi-agent", "scheduler", "stage-gate", "snowflake-guard", "document-standard", "kpi", "rnr"]
     }

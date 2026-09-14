@@ -557,29 +557,11 @@ def build(m: dict) -> dict:
                     ]},
                 ],
             },
-            # --------------------------------------------------------- 10
-            {
-                "id": "sources", "title": "부록 — 측정 원천",
-                "blocks": [{
-                    "type": "appendix_source",
-                    "note": "이 문서의 모든 수치는 빌드 시점에 아래에서 측정했다.",
-                    "items": [
-                        {"name": "IR 규칙 테스트", "path": "engine/tests/test_ir.py",
-                         "rows": m["ir_total"], "as_of": AS_OF},
-                        {"name": "humanize 불변식 테스트", "path": "engine/tests/test_humanize_io.py",
-                         "rows": m["hz_total"], "as_of": AS_OF},
-                        {"name": "매니페스트 규칙 테스트", "path": "engine/tests/test_manifest.py",
-                         "rows": m["mf_total"], "as_of": AS_OF},
-                        {"name": "golden HTML", "path": "standard/examples/golden/rnr.html",
-                         "rows": m["golden_bytes"], "as_of": AS_OF},
-                        {"name": "예제 IR (실제 R&R 워크북 파생)",
-                         "path": "standard/examples/rnr.example.somdoc.json",
-                         "sheet": "12 sections", "rows": m["ex_blocks"], "as_of": AS_OF},
-                        {"name": "엔진 코드", "path": "engine/**/*.py",
-                         "rows": m["py_lines"], "as_of": AS_OF},
-                    ],
-                }],
-            },
+            # The measurement appendix was removed from both published pages.
+            # Every number in this document is already generated from a live
+            # measurement rather than typed, and `docs/check_counts.py` is what
+            # proves that -- a table restating the file paths added a section
+            # without adding an assurance.
         ],
     }
 
