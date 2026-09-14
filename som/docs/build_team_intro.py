@@ -469,24 +469,12 @@ def build(m: dict) -> dict:
                              "없고, som 이 있으면 알아서 씁니다."},
                 ],
             },
-            # -------------------------------------------------------- 8
-            {
-                "id": "sources", "title": "부록 — 이 문서의 숫자",
-                "blocks": [{
-                    "type": "appendix_source",
-                    "note": "빌드 시점에 저장소에서 측정했습니다.",
-                    "items": [
-                        {"name": "레시피 목록", "path": "skills/conduct/recipes/*.json",
-                         "rows": m["n_recipes"], "as_of": AS_OF},
-                        {"name": "오케스트레이션 실측", "path": "test/e2e-conduct.mjs",
-                         "sheet": "실제 Claude 워커 3개 · 2 wave", "rows": m["e2e_s"],
-                         "as_of": AS_OF},
-                        {"name": "R&R 검증 사례", "path": "standard/examples/rnr.example.somdoc.json",
-                         "sheet": "2026 SOM Team R&R v1.0.xlsx 파생", "rows": 15,
-                         "as_of": AS_OF},
-                    ],
-                }],
-            },
+            # The build-measurement appendix was removed on purpose. This page
+            # is read by people who are not going to open `test/e2e-conduct.mjs`,
+            # and a table of file paths and row counts is noise to them --
+            # worse, it is the last thing they see. The engineering provenance
+            # lives in `som-how-it-works.html`, which is written for the
+            # audience that wants it.
         ],
     }
 

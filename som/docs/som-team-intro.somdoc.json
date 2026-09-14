@@ -683,38 +683,6 @@
       ],
       "id": "start",
       "title": "시작하기"
-    },
-    {
-      "blocks": [
-        {
-          "items": [
-            {
-              "as_of": "2026-09-09",
-              "name": "레시피 목록",
-              "path": "skills/conduct/recipes/*.json",
-              "rows": 6
-            },
-            {
-              "as_of": "2026-09-09",
-              "name": "오케스트레이션 실측",
-              "path": "test/e2e-conduct.mjs",
-              "rows": 73,
-              "sheet": "실제 Claude 워커 3개 · 2 wave"
-            },
-            {
-              "as_of": "2026-09-09",
-              "name": "R&R 검증 사례",
-              "path": "standard/examples/rnr.example.somdoc.json",
-              "rows": 15,
-              "sheet": "2026 SOM Team R&R v1.0.xlsx 파생"
-            }
-          ],
-          "note": "빌드 시점에 저장소에서 측정했습니다.",
-          "type": "appendix_source"
-        }
-      ],
-      "id": "sources",
-      "title": "부록 — 이 문서의 숫자"
     }
   ],
   "theme": "paper"

@@ -1,6 +1,6 @@
 {
   "name": "som",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "displayName": "som — SOM work orchestration",
   "description": "Stage-gated multi-agent runs on the Orca CLI plus the SOM Doc Standard. Ambiguity-gated intake, wave scheduling with write-conflict avoidance, autonomy levels with frozen hard floors, Snowflake access that runs reads and asks before writes, and self-contained local-file deliverables (HTML and xlsx today; docx and pptx are not implemented yet).",
   "author": {
