@@ -1,0 +1,1189 @@
+{
+  "doc_type": "report",
+  "docmeta": {
+    "as_of": "2026-09-09",
+    "author": "Kyeong Je Kim",
+    "classification": "Internal",
+    "org": "SOM Unit / BO-Data",
+    "slug": "som_how_it_works",
+    "subtitle": "SOM 업무 오케스트레이션 플러그인 · 그림과 표 중심 설명",
+    "title": "som — 어떻게 작동하는가",
+    "version": "v0.1.0"
+  },
+  "lang": "ko",
+  "metrics": {
+    "golden_kb": {
+      "computed_at": "2026-09-09",
+      "formula": "standard/examples/golden/rnr.html 파일 크기",
+      "unit": " KB",
+      "value": 68.3
+    },
+    "py_lines": {
+      "computed_at": "2026-09-09",
+      "formula": "engine/**/*.py 행수 합",
+      "source_rows": 27,
+      "unit": " lines",
+      "value": 7209
+    },
+    "tests": {
+      "computed_at": "2026-09-09",
+      "formula": "test_ir.py 통과 + test_humanize_io.py 통과",
+      "source_rows": 85,
+      "unit": "건",
+      "value": 85
+    }
+  },
+  "sds_version": 1,
+  "sections": [
+    {
+      "blocks": [
+        {
+          "derived": true,
+          "items": [
+            {
+              "label": "통과 테스트",
+              "note": "IR · humanize · 매니페스트",
+              "state": "ok",
+              "unit": " / 85",
+              "value": 85
+            },
+            {
+              "label": "고정 스테이지",
+              "note": "게이트 4개는 코드가 판정",
+              "unit": "개",
+              "value": 5
+            },
+            {
+              "label": "엔진 코드",
+              "note": "Python 27개 파일",
+              "unit": " lines",
+              "value": 7209
+            },
+            {
+              "label": "산출물 형식",
+              "note": "HTML·xlsx 가동 / docx·pptx 예정",
+              "unit": "종",
+              "value": 4
+            }
+          ],
+          "type": "kpi_tiles"
+        },
+        {
+          "body": "이 페이지는 som 의 문서 엔진이 렌더했다. 위 숫자는 저장소에서 빌드 시점에 측정한 값이며, 손으로 적은 값이 아니다. 엔진이 자기 설명서를 못 만들면 준비된 게 아니다.",
+          "kind": "info",
+          "title": "이 문서 자체가 검증이다",
+          "type": "callout"
+        }
+      ],
+      "derived": true,
+      "id": "glance",
+      "title": "한눈에"
+    },
+    {
+      "blocks": [
+        {
+          "items": [
+            {
+              "emph": true,
+              "text": "반복 업무 세 종류가 매번 손으로, 매번 다른 형태로 나온다"
+            },
+            {
+              "text": "데이터 분석 — Snowflake 파이프라인을 프로젝트마다 재구현"
+            },
+            {
+              "text": "내부 도구 개발 — 기획·구현·검증 순서가 매번 다름"
+            },
+            {
+              "text": "팀 운영 문서 — R&R·KPI·팀 정의에 공통 포맷이 없어 일회성 산출물"
+            },
+            {
+              "emph": true,
+              "text": "결과: 팀원이 같은 품질로 재생산할 수 없다"
+            }
+          ],
+          "title": "지금의 문제",
+          "type": "bullets"
+        },
+        {
+          "items": [
+            {
+              "emph": true,
+              "text": "세 업무를 같은 5-stage 게이트 골격 위에 올린다"
+            },
+            {
+              "text": "게이트 통과 조건을 산문이 아니라 코드로 판정한다"
+            },
+            {
+              "text": "산출물은 검증된 공통 포맷 하나에서 파생된다"
+            },
+            {
+              "emph": true,
+              "text": "Orca 가 없는 팀원도 같은 바이트를 재현할 수 있다"
+            }
+          ],
+          "title": "som 의 대응",
+          "type": "bullets"
+        },
+        {
+          "columns": [
+            {
+              "align": "text",
+              "key": "cmd",
+              "label": "커맨드"
+            },
+            {
+              "align": "text",
+              "key": "dom",
+              "label": "도메인"
+            },
+            {
+              "align": "wrap",
+              "key": "in",
+              "label": "입력"
+            },
+            {
+              "align": "wrap",
+              "key": "out",
+              "label": "산출물"
+            },
+            {
+              "align": "badge",
+              "key": "st",
+              "label": "상태"
+            }
+          ],
+          "row_grain": "행 1개 = 파이프라인 1개",
+          "rows": [
+            [
+              "/som:doc",
+              "팀 운영 문서",
+              "xlsx roster · 기존 문서",
+              "HTML + xlsx (+docx)",
+              {
+                "label": "가동",
+                "state": "ok"
+              }
+            ],
+            [
+              "/som:data",
+              "Snowflake 분석",
+              "numbered SQL · parquet 캐시",
+              "리포트 + metrics.json",
+              {
+                "label": "Phase 2",
+                "state": "warn"
+              }
+            ],
+            [
+              "/som:build",
+              "내부 도구 개발",
+              "인터페이스 명세",
+              "코드 + 검증 매뉴얼",
+              {
+                "label": "Phase 4",
+                "state": "na"
+              }
+            ]
+          ],
+          "title": "세 도메인",
+          "type": "table"
+        }
+      ],
+      "id": "problem",
+      "title": "무엇을 해결하나"
+    },
+    {
+      "blocks": [
+        {
+          "columns": [
+            {
+              "align": "text",
+              "key": "id",
+              "label": "게이트",
+              "sticky": true
+            },
+            {
+              "align": "text",
+              "key": "stage",
+              "label": "스테이지 전이"
+            },
+            {
+              "align": "wrap",
+              "key": "cond",
+              "label": "통과 조건 (코드가 확인)"
+            },
+            {
+              "align": "badge",
+              "key": "who",
+              "label": "해제"
+            }
+          ],
+          "row_grain": "행 1개 = 게이트 1개",
+          "rows": [
+            [
+              "G0",
+              "INTAKE → BLUEPRINT",
+              "grain 선언 · 기간 · SALESORG 범위 · acceptance 표. 하나라도 없으면 열리지 않는다",
+              {
+                "label": "사람",
+                "state": "info"
+              }
+            ],
+            [
+              "G1",
+              "BLUEPRINT → EXECUTE",
+              "모든 DAG 노드에 writes 글롭. 빈 글롭 노드는 스키마가 거부. 최장 경로 ≤ 4",
+              {
+                "label": "사람",
+                "state": "info"
+              }
+            ],
+            [
+              "G2",
+              "ATTEST → DELIVER",
+              "인쇄된 모든 숫자가 metrics.json key 로 역추적 가능 · 인원별 % 합 = 100",
+              {
+                "label": "자동",
+                "state": "ok"
+              }
+            ],
+            [
+              "G3",
+              "DELIVER → 발행",
+              "bundle + MANIFEST.json + 원천 목록. 자동 발송·자동 복사 없음",
+              {
+                "label": "항상 사람",
+                "state": "crit"
+              }
+            ]
+          ],
+          "title": "게이트 통과 조건",
+          "type": "table"
+        },
+        {
+          "items": [
+            {
+              "emph": true,
+              "text": "Orca 는 스케줄링·동시성·충돌 판단을 하지 않는다 — 루프를 직접 쓴다"
+            },
+            {
+              "text": "writes 글롭이 교차하는 두 태스크는 다음 wave 로 미룬다 (워크트리 격리 아님)"
+            },
+            {
+              "text": "동시 워커 기본 3, current 체크아웃에서 하드 캡 4"
+            },
+            {
+              "text": "중첩 깊이 1 — 코디네이터 1 + 워커 N 평면 구조"
+            }
+          ],
+          "title": "동시성은 이 플러그인이 정한다",
+          "type": "bullets"
+        },
+        {
+          "items": [
+            {
+              "emph": true,
+              "text": "check --wait 타임아웃 · count:0 은 체크포인트다 — 실패가 아니다"
+            },
+            {
+              "text": "코딩 태스크 15~60분은 정상. heartbeat 는 살아있다는 뜻이고 끝났다는 뜻이 아니다"
+            },
+            {
+              "text": "태스크 3회 연속 실패 → Orca circuit-break. 동일 설정 재시도 금지"
+            },
+            {
+              "text": "G2 불일치 → 재개 최대 2회, 그 뒤 사람에게 에스컬레이션"
+            }
+          ],
+          "title": "느린 것과 실패한 것은 다르다",
+          "type": "bullets"
+        }
+      ],
+      "id": "gates",
+      "intro": "게이트는 통과 조건을 만족해야 다음 스테이지가 열리는 구조적 검사다. 판정은 코드가 한다.",
+      "title": "5-stage 게이트"
+    },
+    {
+      "blocks": [
+        {
+          "svg": "<svg viewBox=\"0 0 900 440\" width=\"900\" height=\"440\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"som coordinator loop\"><defs><marker id=\"ar\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-rule-firm)\"/></marker><marker id=\"ar-acc\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-accent)\"/></marker><marker id=\"ar-good\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-good)\"/></marker><marker id=\"ar-crit\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-crit)\"/></marker></defs><rect x=\"20\" y=\"18\" width=\"860\" height=\"150\" rx=\"12\" fill=\"var(--sds-sunk)\" fill-opacity=\"0.55\" stroke=\"var(--sds-rule)\" stroke-dasharray=\"5 4\"/><text x=\"32\" y=\"35\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"650\" fill=\"var(--sds-ink-3)\" letter-spacing=\"0.04em\">CLAUDE CODE 세션  ·  컨텍스트 압축 대상</text><rect x=\"60\" y=\"52\" width=\"200\" height=\"88\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-accent)\" stroke-width=\"1.4\"/><text x=\"160.0\" y=\"92.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-accent)\">ROUTER</text><text x=\"160.0\" y=\"108.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">som-supervisor + router.mjs</text><text x=\"70\" y=\"128\" font-family=\"IBM Plex Mono, Consolas, monospace\" font-size=\"10\" fill=\"var(--sds-ink-3)\">state.json · ack.json</text><rect x=\"330\" y=\"52\" width=\"190\" height=\"88\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.4\"/><text x=\"425.0\" y=\"92.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">판단 · 변경</text><text x=\"425.0\" y=\"108.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">gate / reply / replan</text><rect x=\"590\" y=\"52\" width=\"250\" height=\"88\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-crit)\" stroke-width=\"1.4\" stroke-dasharray=\"4 3\"/><text x=\"715.0\" y=\"100.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"600\" fill=\"var(--sds-crit)\">check 를 절대 호출하지 않는다</text><rect x=\"20\" y=\"232\" width=\"860\" height=\"150\" rx=\"12\" fill=\"var(--sds-surface)\" fill-opacity=\"0.55\" stroke=\"var(--sds-rule)\" stroke-dasharray=\"5 4\"/><text x=\"32\" y=\"249\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"650\" fill=\"var(--sds-ink-3)\" letter-spacing=\"0.04em\">MONITOR  ·  압축 면역</text><rect x=\"60\" y=\"266\" width=\"200\" height=\"88\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-good)\" stroke-width=\"1.4\"/><text x=\"160.0\" y=\"306.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-good)\">WATCHER</text><text x=\"160.0\" y=\"322.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">monitors/inbox-watch.mjs</text><text x=\"70\" y=\"342\" font-family=\"IBM Plex Mono, Consolas, monospace\" font-size=\"10\" fill=\"var(--sds-ink-3)\">loop.json</text><rect x=\"330\" y=\"266\" width=\"190\" height=\"88\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-good)\" stroke-width=\"1.4\"/><text x=\"425.0\" y=\"306.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">유일한 소비자</text><text x=\"425.0\" y=\"322.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">orchestration check --wait</text><rect x=\"590\" y=\"266\" width=\"250\" height=\"88\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.4\"/><text x=\"715.0\" y=\"306.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">Orca 런타임</text><text x=\"715.0\" y=\"322.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">Run · Task · Dispatch</text><path d=\"M160,266 L160,140\" fill=\"none\" stroke=\"var(--sds-good)\" stroke-width=\"1.6\" marker-end=\"url(#ar-good)\"/><text x=\"64\" y=\"210\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-2)\">한 줄 = 이벤트 하나</text><path d=\"M238,140 L238,266\" fill=\"none\" stroke=\"var(--sds-accent)\" stroke-width=\"1.6\" marker-end=\"url(#ar-acc)\"/><text x=\"246\" y=\"186\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-2)\">ack 요청 (파일)</text><path d=\"M520,310 L590,310\" fill=\"none\" stroke=\"var(--sds-good)\" stroke-width=\"1.6\" marker-end=\"url(#ar-good)\"/><path d=\"M590,330 L520,330\" fill=\"none\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><text x=\"555\" y=\"370\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-2)\">delivery (≤50, FIFO)</text><path d=\"M715,266 L715,140\" fill=\"none\" stroke=\"var(--sds-accent)\" stroke-width=\"1.6\" marker-end=\"url(#ar-acc)\"/><text x=\"723\" y=\"205\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-2)\">mutate</text><text x=\"20\" y=\"406\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"11\" font-weight=\"650\" fill=\"var(--sds-ink-2)\">router 가 배치 처리 중 죽으면 ack 가 안 되므로, 다음 세션의 watcher 가 같은 배치를 그대로 재발행한다.</text><text x=\"20\" y=\"424\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"400\" fill=\"var(--sds-ink-3)\">인바운드 이벤트용 별도 durability 가 필요 없는 이유가 이것입니다.</text></svg>",
+          "takeaway": "check 는 FIFO delivery 상태를 변경하므로 정확히 한 프로세스만 호출해야 한다. 그래서 소비자(watcher)와 결정자(router)를 분리했다.",
+          "type": "diagram"
+        },
+        {
+          "items": [
+            {
+              "emph": true,
+              "text": "watcher 는 호스트 관리 Monitor 프로세스라 컨텍스트 압축에 면역이다"
+            },
+            {
+              "emph": true,
+              "text": "router 가 배치 처리 중 죽으면 ack 가 안 되므로, 다음 세션의 watcher 가 같은 배치를 그대로 재발행한다 — 인바운드 durability 가 별도로 필요 없다"
+            },
+            {
+              "text": "락 없음. 파일당 단일 작성자. 모든 쓰기는 tmp → fsync → rename"
+            },
+            {
+              "text": "Orca 가 아는 것은 전부 Orca 에서 재도출한다. 디스크를 신뢰하지 않는다"
+            }
+          ],
+          "title": "이 구조에서 공짜로 얻는 것",
+          "type": "bullets"
+        },
+        {
+          "columns": [
+            {
+              "align": "text",
+              "key": "t",
+              "label": "타입",
+              "sticky": true
+            },
+            {
+              "align": "wrap",
+              "key": "act",
+              "label": "동작"
+            },
+            {
+              "align": "badge",
+              "key": "rel",
+              "label": "터미널 release"
+            }
+          ],
+          "row_grain": "행 1개 = Orca 메시지 타입 1개",
+          "rows": [
+            [
+              "worker_done",
+              "검증 → 정산 확인 → 터미널 회계 → 다음 wave. pane 신원 증명이 안 되면 task-update 폴백",
+              {
+                "label": "예",
+                "state": "ok"
+              }
+            ],
+            [
+              "escalation",
+              "worker-read 로 문맥 확보 → 레벨 내면 guidance, 초과면 게이트",
+              {
+                "label": "아니오",
+                "state": "crit"
+              }
+            ],
+            [
+              "question",
+              "ack 전에 답해야 한다 (워커가 블로킹 중)",
+              {
+                "label": "아니오",
+                "state": "crit"
+              }
+            ],
+            [
+              "heartbeat",
+              "타임스탬프만 갱신. 사용자 출력 0",
+              {
+                "label": "아니오",
+                "state": "crit"
+              }
+            ],
+            [
+              "status",
+              "timeline 에 append. 동작 없음",
+              {
+                "label": "아니오",
+                "state": "crit"
+              }
+            ],
+            [
+              "merge_ready",
+              "DELIVER 큐에 적재",
+              {
+                "label": "아니오",
+                "state": "crit"
+              }
+            ]
+          ],
+          "title": "메시지 타입별 라우팅",
+          "type": "table"
+        }
+      ],
+      "id": "loop",
+      "title": "코디네이터 루프 — 두 프로세스, 하나의 소비자"
+    },
+    {
+      "blocks": [
+        {
+          "svg": "<svg viewBox=\"0 0 900 430\" width=\"900\" height=\"430\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"somdoc pipeline\"><defs><marker id=\"ar\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-rule-firm)\"/></marker><marker id=\"ar-acc\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-accent)\"/></marker><marker id=\"ar-good\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-good)\"/></marker><marker id=\"ar-crit\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-crit)\"/></marker></defs><rect x=\"24\" y=\"40\" width=\"150\" height=\"62\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.4\"/><text x=\"99.0\" y=\"67.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">skeleton</text><text x=\"99.0\" y=\"83.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">rnr · kpi · charter</text><rect x=\"24\" y=\"124\" width=\"150\" height=\"62\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.4\"/><text x=\"99.0\" y=\"151.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">원천 데이터</text><text x=\"99.0\" y=\"167.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">xlsx · Snowflake</text><rect x=\"240\" y=\"82\" width=\"170\" height=\"62\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-accent)\" stroke-width=\"1.4\"/><text x=\"325.0\" y=\"109.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">doc-drafter</text><text x=\"325.0\" y=\"125.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">한국어 프로즈 작성</text><rect x=\"240\" y=\"178\" width=\"170\" height=\"106\" rx=\"12\" fill=\"var(--sds-sunk)\" fill-opacity=\"0.55\" stroke=\"var(--sds-rule)\" stroke-dasharray=\"5 4\"/><text x=\"252\" y=\"195\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"650\" fill=\"var(--sds-ink-3)\" letter-spacing=\"0.04em\">HUMANIZE</text><rect x=\"252\" y=\"204\" width=\"146\" height=\"30\" rx=\"6\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.4\"/><text x=\"325.0\" y=\"223.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"600\" fill=\"var(--sds-ink)\">extract</text><rect x=\"252\" y=\"242\" width=\"146\" height=\"30\" rx=\"6\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-warn)\" stroke-width=\"1.4\"/><text x=\"325.0\" y=\"261.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"600\" fill=\"var(--sds-ink)\">apply + 불변식</text><rect x=\"470\" y=\"82\" width=\"170\" height=\"62\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-good)\" stroke-width=\"1.4\"/><text x=\"555.0\" y=\"109.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-good)\">IR (커밋 대상)</text><text x=\"555.0\" y=\"125.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">*.somdoc.json</text><text x=\"480\" y=\"162\" font-family=\"IBM Plex Mono, Consolas, monospace\" font-size=\"10\" fill=\"var(--sds-ink-3)\">sha256 · sorted keys</text><line x1=\"672\" y1=\"24\" x2=\"672\" y2=\"406\" stroke=\"var(--sds-accent)\" stroke-width=\"1.4\" stroke-dasharray=\"6 5\"/><text x=\"678\" y=\"38\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"650\" fill=\"var(--sds-accent)\">결정론 경계</text><text x=\"678\" y=\"52\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10\" font-weight=\"400\" fill=\"var(--sds-ink-3)\">오른쪽은 LLM 없음</text><rect x=\"760\" y=\"78\" width=\"120\" height=\"54\" rx=\"6\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-good)\" stroke-width=\"1.4\"/><text x=\"820.0\" y=\"101.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">HTML</text><text x=\"820.0\" y=\"117.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">열람 · 단일 파일</text><path d=\"M700,113 L756,105\" fill=\"none\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><rect x=\"760\" y=\"148\" width=\"120\" height=\"54\" rx=\"6\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-info)\" stroke-width=\"1.4\"/><text x=\"820.0\" y=\"171.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">XLSX</text><text x=\"820.0\" y=\"187.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">데이터 진실</text><path d=\"M700,113 L740,113 L740,175 L756,175\" fill=\"none\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><rect x=\"760\" y=\"218\" width=\"120\" height=\"54\" rx=\"6\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-ink-3)\" stroke-width=\"1.4\"/><text x=\"820.0\" y=\"241.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">DOCX</text><text x=\"820.0\" y=\"257.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">회람 (Phase 2)</text><path d=\"M700,113 L740,113 L740,245 L756,245\" fill=\"none\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><rect x=\"760\" y=\"288\" width=\"120\" height=\"54\" rx=\"6\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-ink-3)\" stroke-width=\"1.4\"/><text x=\"820.0\" y=\"311.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">PPTX</text><text x=\"820.0\" y=\"327.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">회의 12장 (Phase 4)</text><path d=\"M700,113 L740,113 L740,315 L756,315\" fill=\"none\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><path d=\"M174,71 L232,100\" fill=\"none\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><path d=\"M174,155 L232,124\" fill=\"none\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><path d=\"M325,144 L325,198\" fill=\"none\" stroke=\"var(--sds-warn)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><path d=\"M398,249 L440,249 L440,120 L466,113\" fill=\"none\" stroke=\"var(--sds-warn)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><text x=\"452\" y=\"190\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-2)\">윤문 적용</text><path d=\"M410,113 L466,113\" fill=\"none\" stroke=\"var(--sds-accent)\" stroke-width=\"1.6\" marker-end=\"url(#ar-acc)\"/><text x=\"24\" y=\"330\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"11\" font-weight=\"650\" fill=\"var(--sds-ink)\">에이전트가 저작하는 것은 IR JSON 하나뿐이다.</text><text x=\"24\" y=\"350\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"400\" fill=\"var(--sds-ink-2)\">skeleton · theme · emitter 는 전부 플러그인 파일이라, 팀원이 커밋된 IR 로 재렌더하면 LLM 패스 없이 같은 바이트가 나온다.</text><text x=\"24\" y=\"372\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"400\" fill=\"var(--sds-ink-2)\">humanize 는 LLM 패스라 비결정적이므로 경계 왼쪽, IR 저작 단계에 있다.</text></svg>",
+          "takeaway": "에이전트가 저작하는 것은 IR JSON 하나뿐이다. 한 IR 이 네 포맷을 서비스하는 게 HTML 과 xlsx 의 숫자가 갈라지지 않는 유일한 구조다.",
+          "type": "diagram"
+        },
+        {
+          "columns": [
+            {
+              "align": "text",
+              "key": "r",
+              "label": "규칙",
+              "sticky": true
+            },
+            {
+              "align": "wrap",
+              "key": "what",
+              "label": "요구"
+            },
+            {
+              "align": "wrap",
+              "key": "why",
+              "label": "없으면 생기는 일"
+            }
+          ],
+          "row_grain": "행 1개 = 규칙 1개",
+          "rows": [
+            [
+              "R1",
+              "모든 표가 row grain 을 선언한다",
+              "독자가 행 단위를 오해한다 — 경영진 오독 1순위"
+            ],
+            [
+              "R2",
+              "모든 차트가 takeaway 를 선언하고 차트 위에 굵게 렌더한다",
+              "결론 없는 차트는 퍼즐이 된다"
+            ],
+            [
+              "R3",
+              "모든 {{!m:key}} 가 metrics 에서 해소된다",
+              "프로즈의 숫자가 출처와 조용히 분리된다"
+            ],
+            [
+              "R4",
+              "제목·버전·기준일이 있다",
+              "날짜·버전 없는 문서는 대체될 수 없다"
+            ],
+            [
+              "R5",
+              "결정 요청이 앞 3개 절 안에 있고 3건 이하다",
+              "6쪽에 묻힌 결정 요청은 결정 요청이 아니다"
+            ],
+            [
+              "R6",
+              "표·차트가 직사각형이다",
+              "행 길이가 어긋나면 데이터가 조용히 사라진다"
+            ],
+            [
+              "R7",
+              "모든 지표가 산식을 갖는다",
+              "KPI 오너십이 실제로 사는 곳이 그 칸이다"
+            ]
+          ],
+          "title": "IR 검증 규칙",
+          "type": "table"
+        },
+        {
+          "items": [
+            {
+              "emph": true,
+              "text": "필터는 행별 data-f 배열만 읽는다. 셀 텍스트를 훑지 않는다"
+            },
+            {
+              "text": "그래서 1100 검색이 PO 번호나 품목 설명에 걸리지 않는다"
+            },
+            {
+              "text": "sticky 헤더 + 하단 2px accent, 숫자 셀 우측정렬 tabular-nums"
+            },
+            {
+              "text": "zebra 없음, hover tint 만. 스트라이프가 배지 색과 싸운다"
+            },
+            {
+              "text": "고유값 20개 초과 컬럼에 검색창 자동 부여"
+            },
+            {
+              "text": "14개 초과 컬럼은 핵심 컬럼 뷰로 열리고 토글을 제공한다. 인쇄는 전체 컬럼"
+            }
+          ],
+          "title": "표 거동 — 검증된 것을 계승했다",
+          "type": "bullets"
+        },
+        {
+          "items": [
+            {
+              "emph": true,
+              "text": "humanize-korean 은 LLM 패스라 비결정적이다"
+            },
+            {
+              "text": "렌더러는 결정적이고 golden test 로 바이트 비교된다"
+            },
+            {
+              "text": "그래서 패스를 렌더 상류(IR 저작)에 둔다 — 커밋되는 IR 이 이미 윤문 상태"
+            },
+            {
+              "text": "수락 조건은 코드가 판정한다: 숫자 multiset · metric ref · 보호 식별자 보존, 길이비 [0.45, 1.60]"
+            },
+            {
+              "emph": true,
+              "text": "하나라도 실패하면 그 필드만 원문으로 롤백하고 exit 2 로 사람을 부른다"
+            },
+            {
+              "text": "KPI 정의 문장·산식과 row grain 은 구조적으로 제외 — 그 문구 자체가 정의다"
+            }
+          ],
+          "title": "humanize 를 IR 저작 단계에 둔 이유",
+          "type": "bullets"
+        }
+      ],
+      "id": "sds",
+      "title": "문서 표준 — 한 IR, 네 emitter"
+    },
+    {
+      "blocks": [
+        {
+          "svg": "<svg viewBox=\"0 0 900 436\" width=\"900\" height=\"436\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"somsql guard\"><defs><marker id=\"ar\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-rule-firm)\"/></marker><marker id=\"ar-acc\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-accent)\"/></marker><marker id=\"ar-good\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-good)\"/></marker><marker id=\"ar-crit\" markerWidth=\"9\" markerHeight=\"7\" refX=\"8.5\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L9,3.5 L0,7 Z\" fill=\"var(--sds-crit)\"/></marker></defs><rect x=\"24\" y=\"128\" width=\"130\" height=\"62\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.4\"/><text x=\"89.0\" y=\"155.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">에이전트 SQL</text><text x=\"89.0\" y=\"171.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">1 파일 = 1 쿼리</text><rect x=\"190\" y=\"32\" width=\"300\" height=\"250\" rx=\"12\" fill=\"var(--sds-sunk)\" fill-opacity=\"0.55\" stroke=\"var(--sds-rule)\" stroke-dasharray=\"5 4\"/><text x=\"202\" y=\"49\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"650\" fill=\"var(--sds-ink-3)\" letter-spacing=\"0.04em\">SOMSQL CLASSIFIER</text><rect x=\"206\" y=\"68\" width=\"268\" height=\"76\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-info)\" stroke-width=\"1.4\"/><text x=\"340.0\" y=\"102.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">1차  sqlglot AST</text><text x=\"340.0\" y=\"118.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">화이트리스트 · 파싱 실패는 deny</text><rect x=\"206\" y=\"168\" width=\"268\" height=\"76\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-info)\" stroke-width=\"1.4\"/><text x=\"340.0\" y=\"202.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">2차  토큰 regex</text><text x=\"340.0\" y=\"218.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">불일치도 deny 로 기록</text><text x=\"340\" y=\"264\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"650\" fill=\"var(--sds-ink-3)\">둘이 엇갈리면 그 자체를 기록</text><rect x=\"540\" y=\"60\" width=\"150\" height=\"62\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-warn)\" stroke-width=\"1.4\"/><text x=\"615.0\" y=\"87.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">cost guard</text><text x=\"615.0\" y=\"103.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">EXPLAIN bytes · LIMIT</text><rect x=\"540\" y=\"150\" width=\"150\" height=\"62\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-good)\" stroke-width=\"1.4\"/><text x=\"615.0\" y=\"177.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-good)\">SELECT 실행</text><text x=\"615.0\" y=\"193.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">단일 커넥션 · SSO 1회</text><rect x=\"740\" y=\"150\" width=\"140\" height=\"62\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-good)\" stroke-width=\"1.4\"/><text x=\"810.0\" y=\"177.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-ink)\">parquet 캐시</text><text x=\"810.0\" y=\"193.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">+ .meta.json</text><path d=\"M154,159 L200,130\" fill=\"none\" stroke=\"var(--sds-rule-firm)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><path d=\"M474,106 L536,91\" fill=\"none\" stroke=\"var(--sds-good)\" stroke-width=\"1.6\" marker-end=\"url(#ar-good)\"/><text x=\"505.0\" y=\"92.5\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-2)\">읽기</text><path d=\"M615,122 L615,146\" fill=\"none\" stroke=\"var(--sds-warn)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><path d=\"M690,181 L736,181\" fill=\"none\" stroke=\"var(--sds-good)\" stroke-width=\"1.6\" marker-end=\"url(#ar-good)\"/><rect x=\"190\" y=\"316\" width=\"690\" height=\"104\" rx=\"12\" fill=\"var(--sds-sunk)\" fill-opacity=\"0.55\" stroke=\"var(--sds-rule)\" stroke-dasharray=\"5 4\"/><text x=\"202\" y=\"333\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"650\" fill=\"var(--sds-ink-3)\" letter-spacing=\"0.04em\">쓰기 — 거부가 아니라 확인</text><rect x=\"206\" y=\"344\" width=\"196\" height=\"62\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-warn)\" stroke-width=\"1.4\"/><text x=\"304.0\" y=\"371.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-warn)\">exit 4  CONFIRM</text><text x=\"304.0\" y=\"387.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">무엇을 · 어디에 · 되돌릴 수 있나</text><rect x=\"442\" y=\"344\" width=\"196\" height=\"62\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-accent)\" stroke-width=\"1.4\"/><text x=\"540.0\" y=\"371.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-accent)\">사람이 승인</text><text x=\"540.0\" y=\"387.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">문 해시 12자 + 사유</text><rect x=\"678\" y=\"344\" width=\"186\" height=\"62\" rx=\"8\" fill=\"var(--sds-surface)\" stroke=\"var(--sds-good)\" stroke-width=\"1.4\"/><text x=\"771.0\" y=\"371.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"12.5\" font-weight=\"650\" fill=\"var(--sds-good)\">실행 · 원장 기록</text><text x=\"771.0\" y=\"387.0\" text-anchor=\"middle\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-3)\">WRITE_LOG.md</text><path d=\"M340,288 L340,340\" fill=\"none\" stroke=\"var(--sds-warn)\" stroke-width=\"1.6\" marker-end=\"url(#ar)\"/><text x=\"226\" y=\"308\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" fill=\"var(--sds-ink-2)\">읽기가 아니면</text><path d=\"M402,375 L438,375\" fill=\"none\" stroke=\"var(--sds-accent)\" stroke-width=\"1.6\" marker-end=\"url(#ar-acc)\"/><path d=\"M638,375 L674,375\" fill=\"none\" stroke=\"var(--sds-good)\" stroke-width=\"1.6\" marker-end=\"url(#ar-good)\"/><text x=\"24\" y=\"238\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"11\" font-weight=\"650\" fill=\"var(--sds-ink)\">쓰기는 막지 않는다.</text><text x=\"24\" y=\"258\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"400\" fill=\"var(--sds-ink-2)\">아무도 안 본 쓰기를</text><text x=\"24\" y=\"274\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"400\" fill=\"var(--sds-ink-2)\">막는다. 승인은 그</text><text x=\"24\" y=\"290\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"400\" fill=\"var(--sds-ink-2)\">문장에만 붙는다 —</text><text x=\"24\" y=\"306\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"400\" fill=\"var(--sds-ink-2)\">한 글자만 고쳐도</text><text x=\"24\" y=\"322\" text-anchor=\"start\" font-family=\"IBM Plex Sans KR, Malgun Gothic, system-ui, sans-serif\" font-size=\"10.5\" font-weight=\"400\" fill=\"var(--sds-ink-2)\">무효가 된다.</text></svg>",
+          "takeaway": "막아야 하는 것은 쓰기가 아니라 아무도 안 본 쓰기다. 승인은 문장의 해시에 묶여 있어, 한 건에 준 예가 다른 건으로 옮겨가지 않는다.",
+          "type": "diagram"
+        },
+        {
+          "columns": [
+            {
+              "align": "wrap",
+              "key": "hole",
+              "label": "구멍",
+              "sticky": true
+            },
+            {
+              "align": "wrap",
+              "key": "ex",
+              "label": "예"
+            },
+            {
+              "align": "badge",
+              "key": "old",
+              "label": "기존"
+            },
+            {
+              "align": "badge",
+              "key": "new",
+              "label": "somsql"
+            }
+          ],
+          "row_grain": "행 1개 = 우회 경로 1개",
+          "rows": [
+            [
+              "첫 토큰만 검사",
+              "WITH x AS (...) INSERT INTO ...",
+              {
+                "label": "통과",
+                "state": "crit"
+              },
+              {
+                "label": "AST 전수 walk",
+                "state": "ok"
+              }
+            ],
+            [
+              "naive ; 분할",
+              "WHERE name = 'a;DROP TABLE t'",
+              {
+                "label": "오분할",
+                "state": "crit"
+              },
+              {
+                "label": "파서 기준",
+                "state": "ok"
+              }
+            ],
+            [
+              "deny-list 방식",
+              "목록에 없는 신규 statement",
+              {
+                "label": "통과",
+                "state": "crit"
+              },
+              {
+                "label": "default-deny",
+                "state": "ok"
+              }
+            ],
+            [
+              "파싱 실패 폴백",
+              "정규식만으로 통과",
+              {
+                "label": "약해짐",
+                "state": "warn"
+              },
+              {
+                "label": "fail closed",
+                "state": "ok"
+              }
+            ],
+            [
+              "스크립트 우회",
+              "6줄 커넥터 스크립트를 새로 작성",
+              {
+                "label": "무력",
+                "state": "crit"
+              },
+              {
+                "label": "PreToolUse 훅이 경고",
+                "state": "warn"
+              }
+            ]
+          ],
+          "title": "기존 sf_utils.py 대비 막은 구멍",
+          "type": "table"
+        },
+        {
+          "columns": [
+            {
+              "align": "wrap",
+              "key": "step",
+              "label": "단계",
+              "sticky": true
+            },
+            {
+              "align": "badge",
+              "key": "who",
+              "label": "누가"
+            },
+            {
+              "align": "wrap",
+              "key": "what",
+              "label": "무엇이 일어나는가"
+            }
+          ],
+          "row_grain": "행 1개 = 단계 1개",
+          "rows": [
+            [
+              "describe",
+              {
+                "label": "도구",
+                "state": "ok"
+              },
+              "동사 · 대상 객체 · 되돌릴 수 있는지 · 위험 요소를 문장으로 출력. 접속하지 않는다"
+            ],
+            [
+              "confirm",
+              {
+                "label": "사람",
+                "state": "warn"
+              },
+              "그 문장의 sha256 앞 12자와 사유를 입력. 모델은 채울 수 없다"
+            ],
+            [
+              "execute",
+              {
+                "label": "도구",
+                "state": "ok"
+              },
+              "승인이 해시와 일치할 때만 전송. 한 글자라도 다르면 다시 묻는다"
+            ],
+            [
+              "record",
+              {
+                "label": "도구",
+                "state": "ok"
+              },
+              "동사 · 대상 · 영향 행 · 승인자 · 사유가 ledger 와 WRITE_LOG.md 에"
+            ]
+          ],
+          "title": "읽기가 아닌 문장이 지나는 자리",
+          "type": "table"
+        },
+        {
+          "items": [
+            {
+              "emph": true,
+              "text": "UPDATE · DELETE 에 WHERE 가 없다 — 대상 테이블의 모든 행"
+            },
+            {
+              "text": "OR REPLACE — 같은 이름이 이미 있으면 그 내용이 사라진다"
+            },
+            {
+              "text": "CALL — 프로시저 내부는 이 도구가 볼 수 없고, 볼 수 없다고 말한다"
+            },
+            {
+              "text": "대상 객체명을 읽어내지 못했다 — 추측을 출력하는 대신 그렇다고 말하고 심각도를 올린다. 틀린 대상 줄은 없는 대상 줄보다 나쁘다"
+            }
+          ],
+          "title": "쓰기에서 경보가 올라가는 네 가지",
+          "type": "bullets"
+        },
+        {
+          "items": [
+            {
+              "emph": true,
+              "text": "상한이 없다. byte · 행 · statement timeout 제한을 전부 없앴고, LIMIT 을 몰래 끼워 넣지 않는다"
+            },
+            {
+              "text": "그 LIMIT 주입이 가장 나빴다 — 41만 행 추출에 1,000행을 돌려주면 잘린 결과가 완전한 결과와 똑같이 생긴다"
+            },
+            {
+              "text": "ON/USING 없는 join(cartesian) 은 실행 전에 알려준다"
+            },
+            {
+              "emph": true,
+              "text": "EXPLAIN USING JSON 으로 사전 스캔 견적 — 크레딧 0"
+            },
+            {
+              "text": "동일 stmt hash 24시간 캐시 — 같은 질문을 두 번 돌리지 않는다"
+            },
+            {
+              "text": "매 실행 ledger 기록 → DELIVER 부록에 산출물당 비용 표로 노출. 비용 가시화와 비용 통제는 다른 일이고, 원치 않은 쪽은 통제였다"
+            }
+          ],
+          "title": "읽기는 막지 않는다 — 알려줄 뿐이다",
+          "type": "bullets"
+        },
+        {
+          "body": "PreToolUse 훅은 이 플러그인 밖에서 Snowflake 에 닿는 명령과 파일을 거부하지 않고 경고한다. 팀에는 이 플러그인이 생기기 전부터 쓰던 스크립트가 있고, 그것을 막는 것은 som 과 무관한 업무를 세우는 일이었다. 경고가 알려주는 것은 그 실행이 원장 밖이라는 사실이다 — 나중에 '언제 무엇을 했나' 를 되짚을 때 그 줄만 비어 있다.",
+          "kind": "warn",
+          "title": "기존 스크립트는 막지 않는다",
+          "type": "callout"
+        },
+        {
+          "body": "래퍼는 defense-in-depth 다. 무엇을 쓸 수 있는지의 근본은 Snowflake role 의 grant 이고, 사람마다 필요한 만큼만 주도록 DCOE 에 요청하는 것이 이 설계 전체에서 가장 가치 높은 조치다.",
+          "kind": "info",
+          "title": "권한은 여전히 role 이 정한다",
+          "type": "callout"
+        }
+      ],
+      "id": "snowflake",
+      "title": "Snowflake 안전 — 읽기 자동, 쓰기는 승인"
+    },
+    {
+      "blocks": [
+        {
+          "caption": "이 표는 손으로 쓴 것이 아니라 이 문서를 빌드할 때 `decide()` 에 직접 물어 만든 것이다. 점수 0~100, 상향은 30분 쿨다운과 완료된 런 ≥1 을 둘 다 요구한다. 하드 플로어 위반 시 즉시 L0.",
+          "cells": [
+            [
+              "1",
+              "2",
+              "3",
+              "4",
+              "4"
+            ],
+            [
+              "확인",
+              "확인",
+              "자동",
+              "자동",
+              "자동"
+            ],
+            [
+              "확인",
+              "확인",
+              "자동",
+              "자동",
+              "자동"
+            ],
+            [
+              "확인",
+              "확인",
+              "확인",
+              "자동",
+              "자동"
+            ],
+            [
+              "확인",
+              "자동",
+              "자동",
+              "자동",
+              "자동"
+            ],
+            [
+              "거부",
+              "확인",
+              "확인",
+              "확인",
+              "확인"
+            ],
+            [
+              "확인",
+              "확인",
+              "확인",
+              "자동",
+              "자동"
+            ],
+            [
+              "거부",
+              "거부",
+              "거부",
+              "거부",
+              "거부"
+            ],
+            [
+              "거부",
+              "거부",
+              "거부",
+              "거부",
+              "거부"
+            ],
+            [
+              "확인",
+              "확인",
+              "확인",
+              "확인",
+              "확인"
+            ]
+          ],
+          "columns": [
+            "L0",
+            "L1",
+            "L2",
+            "L3",
+            "L4"
+          ],
+          "corner": "동작",
+          "rows": [
+            "최대 병렬 워커",
+            "워커 띄우기 (worker.start)",
+            "스펙 안의 워커 질문 (answer.question)",
+            "범위가 바뀌는 질문 (answer.scope-change)",
+            "선언한 글롭 안 쓰기 (write.in-scope)",
+            "선언한 글롭 밖 쓰기 (write.out-of-scope)",
+            "워커 강제 종료 (worker.stop)",
+            "새 워크트리 (worktree.create)",
+            "자기 게이트 해제 (gate.self-resolve)",
+            "Snowflake 쓰기 (snowflake.write)"
+          ],
+          "title": "레벨별 자동 승인 범위",
+          "type": "matrix"
+        },
+        {
+          "items": [
+            {
+              "text": "orchestration.reset — orchestration reset. 진행 중인 조율 상태를 파괴합니다."
+            },
+            {
+              "text": "git.force-push — force push · 브랜치 삭제 · dirty 트리 reset --hard."
+            },
+            {
+              "text": "publish — artifact 발행 · 공유 폴더 자동 복사. 산출물은 로컬 파일이고 배포는 사람이 합니다."
+            },
+            {
+              "text": "edit.user-config — ~/.claude/settings.json · CLAUDE.md · 플러그인 설정 편집."
+            },
+            {
+              "text": "gate.self-resolve — 자기가 만든 게이트를 자기가 해제하는 것."
+            },
+            {
+              "text": "worktree.create — 새 워크트리 생성. 사람 확인이 항상 필요합니다."
+            }
+          ],
+          "title": "동결된 하드 플로어 (6개)",
+          "type": "bullets"
+        },
+        {
+          "body": "게이트는 엔진이 물어볼 수 있는 예/아니오다. 하드 플로어는 사람이 자기 턴에 직접 요구를 타이핑해야 하는 것이다. Snowflake 쓰기는 플로어에서 게이트로 내려왔다 — 근거였던 '사람의 예를 쓰기로 바꾸는 코드 경로가 없다' 가 테이블을 만들어야 하는 날 깨졌기 때문이다. 어느 레벨에서도 자동이 되지 않는다는 점은 그대로다.",
+          "kind": "info",
+          "title": "비대칭이 의도적이다",
+          "type": "callout"
+        }
+      ],
+      "id": "autonomy",
+      "title": "자율 레벨 — 신뢰가 해제할 수 없는 것"
+    },
+    {
+      "blocks": [
+        {
+          "categories": [
+            "IR 규칙",
+            "SQL 분류·cost guard",
+            "humanize 불변식",
+            "매니페스트 규칙"
+          ],
+          "derived": true,
+          "height": 240,
+          "kind": "bar",
+          "series": [
+            {
+              "name": "통과",
+              "values": [
+                25,
+                27,
+                11,
+                22
+              ]
+            }
+          ],
+          "src": "engine/tests/*.py",
+          "takeaway": "Python 엔진 테스트 85건 전부 통과 (Node 쪽 오케스트레이션·게이트 테스트는 별도). 안전에 직결된 항목(숫자 유실·발명, metric ref 변경, 보호 용어 유실)이 포함된다.",
+          "type": "chart",
+          "y_unit": "건"
+        },
+        {
+          "columns": [
+            {
+              "align": "wrap",
+              "key": "claim",
+              "label": "주장",
+              "sticky": true
+            },
+            {
+              "align": "wrap",
+              "key": "how",
+              "label": "검증 방법"
+            },
+            {
+              "align": "wrap",
+              "key": "res",
+              "label": "결과"
+            },
+            {
+              "align": "badge",
+              "key": "st",
+              "label": "판정"
+            }
+          ],
+          "row_grain": "행 1개 = 검증 항목 1개",
+          "rows": [
+            [
+              "HTML 렌더가 결정적이다",
+              "동일 IR 로 2회 빌드해 바이트 비교",
+              "69,893 bytes 동일",
+              {
+                "label": "확인",
+                "state": "ok"
+              }
+            ],
+            [
+              "golden 레퍼런스와 일치한다",
+              "커밋된 golden 과 바이트 비교",
+              "byte-identical",
+              {
+                "label": "확인",
+                "state": "ok"
+              }
+            ],
+            [
+              "HTML 이 자기완결이다",
+              "외부 src/href · @import · <link> 정규식 검사",
+              "외부 요청 0",
+              {
+                "label": "확인",
+                "state": "ok"
+              }
+            ],
+            [
+              "xlsx 는 바이트 결정적이지 않다",
+              "2회 빌드해 파일 바이트 비교",
+              "바이트 불일치 — zip 타임스탬프",
+              {
+                "label": "설계 반영",
+                "state": "warn"
+              }
+            ],
+            [
+              "xlsx 내용은 안정적이다",
+              "시트명·좌표·값 다이제스트 비교",
+              "다이제스트 동일",
+              {
+                "label": "확인",
+                "state": "ok"
+              }
+            ],
+            [
+              "hook timeout 은 초 단위다",
+              "CC 바이너리에서 hook.timeout*1000 및 와이어 필드 timeout_s 확인",
+              "초 단위 확정 — 5000 이면 83분이 된다",
+              {
+                "label": "확인",
+                "state": "ok"
+              }
+            ],
+            [
+              "orca.cmd 가 send 를 거부한다",
+              "orca.cmd line 13-14 확인",
+              "거부. .EXE 가 PATHEXT 앞이라 현재는 운으로 동작",
+              {
+                "label": "어댑터 대응",
+                "state": "warn"
+              }
+            ],
+            [
+              "monitors 서페이스가 존재한다",
+              "CC 바이너리 문자열 확인",
+              "persistent Monitor task, on-skill-invoke",
+              {
+                "label": "확인",
+                "state": "ok"
+              }
+            ],
+            [
+              "실제 R&R 워크북이 처리된다",
+              "15명 4팀 6시트 → IR → 렌더",
+              "12절 13블록",
+              {
+                "label": "확인",
+                "state": "ok"
+              }
+            ]
+          ],
+          "title": "주장 대비 검증 방법",
+          "type": "table"
+        },
+        {
+          "categories": [
+            "som HTML (자기완결)",
+            "som xlsx",
+            "archify 독립 HTML"
+          ],
+          "derived": true,
+          "kind": "hbar",
+          "label_width": 210,
+          "series": [
+            {
+              "name": "KB",
+              "values": [
+                68.3,
+                26.9,
+                605.5
+              ]
+            }
+          ],
+          "src": "측정: 2026-09-09 빌드 산출물",
+          "takeaway": "단일 파일 HTML 이 archify 독립 아티팩트의 약 1/9 크기이고, 외부 요청이 0이라 망분리 랩탑에서도 열린다.",
+          "type": "chart",
+          "y_unit": " KB"
+        }
+      ],
+      "derived": true,
+      "id": "verified",
+      "intro": "주장과 측정을 분리한다. 아래는 전부 이 저장소에서 실행해 확인한 값이다.",
+      "title": "검증된 사실"
+    },
+    {
+      "blocks": [
+        {
+          "columns": [
+            {
+              "align": "num",
+              "key": "n",
+              "label": "#"
+            },
+            {
+              "align": "wrap",
+              "key": "cmd",
+              "label": "명령"
+            },
+            {
+              "align": "wrap",
+              "key": "note",
+              "label": "설명"
+            }
+          ],
+          "row_grain": "행 1개 = 단계 1개",
+          "rows": [
+            [
+              1,
+              "/plugin marketplace add KyeongJe/som-claude-plugin",
+              "private repo. 조직 접근 권한이 있어야 한다"
+            ],
+            [
+              2,
+              "/plugin install som@som-marketplace",
+              "user scope 설치"
+            ],
+            [
+              3,
+              "/som:doctor",
+              "Python 의존성 · 시크릿 노출 · 동기 경로 점검"
+            ],
+            [
+              4,
+              "/som:doc rnr",
+              "Orca 가 없으면 한 세션 순차 모드로 동작"
+            ]
+          ],
+          "title": "팀원 설치",
+          "type": "table"
+        },
+        {
+          "items": [
+            {
+              "emph": true,
+              "text": "5 stage 를 한 세션에서 순차 수행. 게이트는 stop-and-ask 로 격하"
+            },
+            {
+              "text": "에이전트 저작물은 IR JSON 하나. 렌더는 python -m somdoc build"
+            },
+            {
+              "text": "skeleton · theme · emitter 가 전부 플러그인 파일이라 산출물이 바이트 비교 가능"
+            },
+            {
+              "emph": true,
+              "text": "가장 강한 degradation: 에이전트를 건너뛰고 IR + 명령 한 줄만 넘겨도 동일 산출물"
+            }
+          ],
+          "title": "Orca 가 없는 팀원의 재현 경로",
+          "type": "bullets"
+        },
+        {
+          "items": [
+            {
+              "emph": true,
+              "text": "다른 플러그인을 호출하지 않고 그 상태 폴더를 읽지도 쓰지도 않는다"
+            },
+            {
+              "text": "Orca 의 orchestration 스킬이 CLI 문법의 권위다 — 여기 요약하지 않는다"
+            },
+            {
+              "text": "Artifact 발행 경로가 없다. 산출물은 로컬 파일뿐"
+            },
+            {
+              "text": "다른 플러그인이 트리거로 쓰는 문구를 피한다 — 가로채면 도구가 아니라 방해가 된다"
+            }
+          ],
+          "title": "경계 — 무엇을 쓰지 않는가",
+          "type": "bullets"
+        }
+      ],
+      "id": "use",
+      "title": "설치와 사용"
+    },
+    {
+      "blocks": [
+        {
+          "items": [
+            {
+              "as_of": "2026-09-09",
+              "name": "IR 규칙 테스트",
+              "path": "engine/tests/test_ir.py",
+              "rows": 25
+            },
+            {
+              "as_of": "2026-09-09",
+              "name": "humanize 불변식 테스트",
+              "path": "engine/tests/test_humanize_io.py",
+              "rows": 11
+            },
+            {
+              "as_of": "2026-09-09",
+              "name": "매니페스트 규칙 테스트",
+              "path": "engine/tests/test_manifest.py",
+              "rows": 22
+            },
+            {
+              "as_of": "2026-09-09",
+              "name": "golden HTML",
+              "path": "standard/examples/golden/rnr.html",
+              "rows": 69893
+            },
+            {
+              "as_of": "2026-09-09",
+              "name": "예제 IR (실제 R&R 워크북 파생)",
+              "path": "standard/examples/rnr.example.somdoc.json",
+              "rows": 13,
+              "sheet": "12 sections"
+            },
+            {
+              "as_of": "2026-09-09",
+              "name": "엔진 코드",
+              "path": "engine/**/*.py",
+              "rows": 7209
+            }
+          ],
+          "note": "이 문서의 모든 수치는 빌드 시점에 아래에서 측정했다.",
+          "type": "appendix_source"
+        }
+      ],
+      "id": "sources",
+      "title": "부록 — 측정 원천"
+    }
+  ],
+  "theme": "console"
+}

@@ -1,0 +1,92 @@
+{
+  "id": "watch",
+  "title": "반복 검증 루프 (밤샘 가능)",
+  "summary": "대상을 반복해서 확인하고, 달라진 것과 깨진 것만 보고한다. 조용하면 조용히 있는다.",
+  "match": [
+    "확인",
+    "검증",
+    "모니터",
+    "감시",
+    "밤새",
+    "계속",
+    "반복",
+    "챗봇",
+    "chatbot",
+    "watch",
+    "monitor",
+    "회귀",
+    "regression",
+    "qa"
+  ],
+  "requires": [],
+  "budgetMinutes": 600,
+  "defaults": {
+    "slug": "watch",
+    "rounds": "12",
+    "intervalMinutes": "30"
+  },
+  "asks": [
+    {
+      "slot": "target",
+      "q": "무엇을 확인하나요? (URL · API · 로그 경로 · 화면 이름 무엇이든)",
+      "why": "확인할 대상을 모르면 아무것도 못 봅니다"
+    },
+    {
+      "slot": "normal",
+      "q": "무엇이 정상이고 무엇이 이상인가요?",
+      "why": "이 기준이 없으면 '이상 없음' 이라는 보고가 아무 의미가 없습니다"
+    },
+    {
+      "slot": "rounds",
+      "q": "몇 번 확인할까요? (기본 12회)",
+      "required": false
+    },
+    {
+      "slot": "intervalMinutes",
+      "q": "몇 분 간격으로 할까요? (기본 30분)",
+      "required": false
+    }
+  ],
+  "nodes": [
+    {
+      "key": "probe-design",
+      "title": "확인 방법 설계",
+      "role": "architect",
+      "deps": [],
+      "writes": [
+        "docs/{{slug}}/probe.md",
+        "docs/{{slug}}/baseline.json"
+      ],
+      "spec": "대상 {{target}} 을 어떻게 확인할지 정한다. 먼저 무엇이 실제로 가능한지 조사하라 — 열 수 있는 URL 인가, 때릴 수 있는 API 인가, 읽을 수 있는 로그·DB 인가. 가능한 방법 중 가장 싸고 가장 결정적인 것을 고른다. 정상·이상의 기준은 {{normal}} 이다. 그 다음 정상 상태를 baseline.json 에 기록한다. 무엇을 '이상'으로 볼지 판정 규칙을 명시하라 — 느린 것과 죽은 것은 다르다.",
+      "acceptance": "probe.md 에 확인 절차가 재현 가능하게 적혀 있고, baseline.json 에 정상 상태의 관측값이 있으며, 이상 판정 규칙이 명시돼 있다",
+      "notes": "브라우저가 필요하면 Orca 임베디드 브라우저를 쓴다. 외부 브라우저 창은 Computer Use, 페이지 자동화는 Playwright. 무엇을 골랐는지 probe.md 에 적어라."
+    },
+    {
+      "key": "round",
+      "title": "검증 라운드",
+      "role": "watcher",
+      "deps": [
+        "probe-design"
+      ],
+      "writes": [
+        "docs/{{slug}}/rounds/**"
+      ],
+      "spec": "probe.md 절차를 {{rounds}} 회, 약 {{intervalMinutes}} 분 간격으로 반복한다. 매 라운드마다 관측값을 rounds/NNN.json 에 남기고 baseline 과 비교한다. 라운드 사이에는 heartbeat 만 보내고 조용히 있어라 — 정상은 보고할 것이 아니다. 이상을 발견하면 즉시 escalation 을 보내고, 재현 절차와 관측값을 함께 담아라. 확실하지 않으면 한 번 더 확인한 뒤 보고하라: 한 번의 실패는 장애가 아닐 수 있다.",
+      "acceptance": "rounds/ 에 라운드별 관측값이 남아 있고, 이상이 있었다면 각각에 대해 재현 절차와 근거가 있다",
+      "notes": "느린 응답과 죽은 응답을 구분하라. 타임아웃 한 번은 체크포인트다."
+    },
+    {
+      "key": "summary",
+      "title": "결과 정리",
+      "role": "scribe",
+      "deps": [
+        "round"
+      ],
+      "writes": [
+        "docs/{{slug}}/SUMMARY.md"
+      ],
+      "spec": "라운드 전체를 요약한다. 맨 위 한 줄로 '이상 N건 / 정상 M회'. 그 다음 이상 건별로 언제·무엇이·어떻게 재현되는지. 마지막에 baseline 대비 달라진 것. 아무 일도 없었으면 그렇게 한 줄로 쓰고 끝내라 — 없는 문제를 만들지 마라.",
+      "acceptance": "SUMMARY.md 맨 위에 한 줄 결론이 있고, 이상 건마다 재현 절차가 붙어 있다"
+    }
+  ]
+}

@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="ko" data-sds-theme="paper">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="somdoc 0.1.0">
+<meta name="som:ir-sha256" content="4c0fac5bd209bfbde034484421d04ea642d66c47cdf25b42f7acab896907b98a">
+<meta name="som:as-of" content="2026-09-09">
+<title>2026 SOM Team R&amp;R</title>
+<style>
+/* SOM Doc Standard (SDS) v1 - design tokens
+ *
+ * Two themes, one token set:
+ *   sds-paper    team governance documents (R&R, charter)   warm paper, red accent
+ *   sds-console  data reports and KPI documents             cool surface, blue accent
+ *
+ * Both palettes are lifted from documents that already went to this audience,
+ * so they are calibrated rather than invented.
+ *
+ * Rules that are not negotiable:
+ *   - No @import and no link to fonts.googleapis.com. A single-file document
+ *     must not make an outbound request: it breaks on an air-gapped laptop and
+ *     leaks that the file was opened. Local fallback stack only; embedding
+ *     woff2 as base64 is opt-in via `somdoc build --embed-fonts`.
+ *   - Numbers are tabular everywhere. Column alignment in a table of figures is
+ *     not a preference.
+ *   - Committed light look. These are printed and forwarded documents, so the
+ *     ground is declared explicitly and `color-scheme` is pinned.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ---- type scale ---------------------------------------------------- */
+  --sds-fs-display: 40px;
+  --sds-fs-h1:      28px;
+  --sds-fs-h2:      20px;
+  --sds-fs-h3:      15px;
+  --sds-fs-body:    14px;
+  --sds-fs-small:   12.5px;
+  --sds-fs-micro:   11px;
+
+  --sds-lh-display: 1.15;
+  --sds-lh-head:    1.3;
+  --sds-lh-body:    1.55;
+  --sds-tracking:   -0.01em;
+  --sds-tracking-tight: -0.02em;
+
+  --sds-fw-normal:  400;
+  --sds-fw-medium:  500;
+  --sds-fw-bold:    650;
+
+  --sds-font-sans: "IBM Plex Sans KR", "Pretendard", "Malgun Gothic",
+                   "Apple SD Gothic Neo", system-ui, -apple-system, sans-serif;
+  --sds-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas,
+                   "D2Coding", monospace;
+
+  /* ---- spacing (4px base) -------------------------------------------- */
+  --sds-sp-1: 4px;   --sds-sp-2: 8px;   --sds-sp-3: 12px;
+  --sds-sp-4: 16px;  --sds-sp-5: 24px;  --sds-sp-6: 32px;
+  --sds-sp-7: 48px;  --sds-sp-8: 64px;  --sds-sp-9: 96px;
+
+  /* ---- radius / elevation (two levels, deliberately) ----------------- */
+  --sds-r-1: 4px;  --sds-r-2: 8px;  --sds-r-3: 14px;  --sds-r-4: 24px;
+  --sds-sh-1: 0 1px 2px rgba(16, 18, 20, .06), 0 1px 1px rgba(16, 18, 20, .04);
+  --sds-sh-2: 0 8px 24px rgba(16, 18, 20, .10), 0 2px 6px rgba(16, 18, 20, .06);
+
+  /* ---- layout -------------------------------------------------------- */
+  --sds-page-max: 1180px;
+  --sds-prose-max: 68ch;
+  --sds-table-max-h: 70vh;
+}
+
+/* ====================================================================== */
+/*  sds-paper - team governance documents                                 */
+/* ====================================================================== */
+:root,
+[data-sds-theme="paper"] {
+  --sds-bg:        #f0eee6;
+  --sds-surface:   #fbfaf5;
+  --sds-sunk:      #e6e2d6;
+  --sds-ink:       #1a1a18;
+  --sds-ink-2:     #4a4a44;
+  --sds-ink-3:     #6f6f66;
+  --sds-rule:      rgba(26, 26, 24, .14);
+  --sds-rule-firm: rgba(26, 26, 24, .28);
+  --sds-accent:    #d81e28;
+  --sds-accent-bg: rgba(216, 30, 40, .10);
+
+  --sds-good: #00704a;  --sds-good-bg: rgba(0, 112, 74, .10);
+  --sds-warn: #a86f00;  --sds-warn-bg: rgba(168, 111, 0, .10);
+  --sds-crit: #c23a39;  --sds-crit-bg: rgba(194, 58, 57, .10);
+  --sds-info: #315b8f;  --sds-info-bg: rgba(49, 91, 143, .10);
+  --sds-na:   #6f6f66;  --sds-na-bg:   rgba(111, 111, 102, .10);
+
+  /* charts: paper documents use accent + neutrals, not a rainbow */
+  --sds-series-1: #d81e28;
+  --sds-series-2: #4a4a44;
+  --sds-series-3: #a86f00;
+  --sds-series-4: #00704a;
+  --sds-ramp-1: #efe0c9; --sds-ramp-2: #e3c39c;
+  --sds-ramp-3: #cf9a6b; --sds-ramp-4: #a86f00;
+}
+
+/* ====================================================================== */
+/*  sds-console - data reports and KPI documents                          */
+/* ====================================================================== */
+[data-sds-theme="console"] {
+  --sds-bg:        #f1f4f6;
+  --sds-surface:   #ffffff;
+  --sds-sunk:      #e8edef;
+  --sds-ink:       #0f1b22;
+  --sds-ink-2:     #465a62;
+  --sds-ink-3:     #6b7f88;
+  --sds-rule:      #d7dfe1;
+  --sds-rule-firm: #b6c4c9;
+  --sds-accent:    #1c5cab;
+  --sds-accent-bg: rgba(28, 92, 171, .10);
+
+  --sds-good: #0e7a55;  --sds-good-bg: #e3f4ed;
+  --sds-warn: #a86f00;  --sds-warn-bg: #fbf2dc;
+  --sds-crit: #c23a39;  --sds-crit-bg: #fbe9e8;
+  --sds-info: #1c5cab;  --sds-info-bg: #e6eef8;
+  --sds-na:   #6b7f88;  --sds-na-bg:   #eef2f4;
+
+  --sds-series-1: #2a78d6;
+  --sds-series-2: #eb6834;
+  --sds-series-3: #1baf7a;
+  --sds-series-4: #eda100;
+  --sds-ramp-1: #86b6ef; --sds-ramp-2: #5598e7;
+  --sds-ramp-3: #2a78d6; --sds-ramp-4: #1c5cab;
+}
+
+/* SOM Doc Standard (SDS) v1 - base stylesheet
+ *
+ * Table behaviour here is inherited from a report template that already
+ * survived real use (SOM/2026/08. BO Training/01. ZF_ZG_HoldOrder/app/
+ * report_template.py). The parts that look arbitrary are not:
+ *
+ *   - zebra striping is OFF, hover tint is ON. Stripes fight the badge tints.
+ *   - filtering reads a per-row `data-f` JSON array and nothing else, so a
+ *     search for "1100" cannot match a PO number or a description. That bug
+ *     was fixed once already; the source file says not to undo it.
+ *   - a table wider than 14 columns opens on a core-column view with a toggle,
+ *     because 22 columns cannot be read across on a laptop.
+ *   - every table prints its row grain above itself. Misreading the unit of a
+ *     row is the single most common way an exec document gets misused.
+ */
+
+/* ---------------------------------------------------------------- reset */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--sds-bg);
+  color: var(--sds-ink);
+  font-family: var(--sds-font-sans);
+  font-size: var(--sds-fs-body);
+  line-height: var(--sds-lh-body);
+  letter-spacing: var(--sds-tracking);
+  font-variant-numeric: tabular-nums;
+  -moz-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+}
+
+h1, h2, h3, h4 { margin: 0; line-height: var(--sds-lh-head); font-weight: var(--sds-fw-bold); }
+p  { margin: 0 0 var(--sds-sp-3); max-width: var(--sds-prose-max); }
+ul, ol { margin: 0; padding-left: 1.15em; }
+a  { color: var(--sds-accent); text-underline-offset: 2px; }
+code, .sds-mono { font-family: var(--sds-font-mono); font-size: .94em; }
+img, svg { max-width: 100%; }
+:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: 2px; }
+
+/* --------------------------------------------------- dual-language body */
+/* Korean team, English-reading executives. One file serves both.          */
+html[lang="ko"] .sds-en { display: none; }
+html[lang="en"] .sds-ko { display: none; }
+
+/* ------------------------------------------------------------ page frame */
+.sds-page {
+  max-width: var(--sds-page-max);
+  margin: 0 auto;
+  padding: var(--sds-sp-7) var(--sds-sp-5) var(--sds-sp-9);
+}
+
+.sds-doctitle { font-size: var(--sds-fs-display); letter-spacing: var(--sds-tracking-tight); }
+.sds-subtitle { color: var(--sds-ink-2); font-size: var(--sds-fs-h3); margin-top: var(--sds-sp-2); }
+
+/* document control strip: version, as-of, author, approver, next review */
+.sds-control {
+  display: flex; flex-wrap: wrap; gap: var(--sds-sp-1) var(--sds-sp-5);
+  margin-top: var(--sds-sp-5); padding-top: var(--sds-sp-3);
+  border-top: 1px solid var(--sds-rule);
+  font-size: var(--sds-fs-small); color: var(--sds-ink-2);
+}
+.sds-control dt { font-weight: var(--sds-fw-medium); color: var(--sds-ink-3); }
+.sds-control dd { margin: 0; }
+.sds-control > div { display: flex; gap: var(--sds-sp-2); align-items: baseline; }
+
+/* ---------------------------------------------------------------- nav/toc */
+.sds-toc {
+  margin: var(--sds-sp-6) 0 0; padding: var(--sds-sp-4) var(--sds-sp-5);
+  background: var(--sds-surface); border: 1px solid var(--sds-rule);
+  border-radius: var(--sds-r-2);
+}
+.sds-toc ol { list-style: none; padding: 0; columns: 2; column-gap: var(--sds-sp-7); }
+.sds-toc li { margin-bottom: var(--sds-sp-1); font-size: var(--sds-fs-small); break-inside: avoid; }
+.sds-toc a { color: var(--sds-ink-2); text-decoration: none; }
+.sds-toc a:hover { color: var(--sds-accent); text-decoration: underline; }
+.sds-toc .n { display: inline-block; min-width: 1.7em; color: var(--sds-ink-3); font-variant-numeric: tabular-nums; }
+
+/* --------------------------------------------------------------- section */
+.sds-section { margin-top: var(--sds-sp-8); scroll-margin-top: var(--sds-sp-5); }
+.sds-section > h2 {
+  font-size: var(--sds-fs-h1); letter-spacing: var(--sds-tracking-tight);
+  padding-bottom: var(--sds-sp-2); border-bottom: 2px solid var(--sds-rule-firm);
+}
+.sds-section > h2 .n { color: var(--sds-ink-3); margin-right: .5em; font-variant-numeric: tabular-nums; }
+.sds-intro { margin-top: var(--sds-sp-4); color: var(--sds-ink-2); }
+.sds-block { margin-top: var(--sds-sp-5); }
+.sds-block > h3 { font-size: var(--sds-fs-h2); margin-bottom: var(--sds-sp-3); }
+
+/* derived content is computed, never hand-written. Say so in the document. */
+.sds-derived-tag {
+  display: inline-block; margin-left: var(--sds-sp-2); padding: 1px 6px;
+  border: 1px solid var(--sds-rule-firm); border-radius: var(--sds-r-1);
+  font-size: var(--sds-fs-micro); font-weight: var(--sds-fw-normal);
+  color: var(--sds-ink-3); vertical-align: middle; letter-spacing: 0;
+}
+
+/* ------------------------------------------------------ decision request */
+/* Pinned near the top of every document. What am I being asked to approve. */
+.sds-decision {
+  border: 2px solid var(--sds-accent); border-radius: var(--sds-r-3);
+  background: var(--sds-surface); padding: var(--sds-sp-5);
+  box-shadow: var(--sds-sh-1);
+}
+.sds-decision > h3 {
+  display: flex; align-items: center; gap: var(--sds-sp-2);
+  color: var(--sds-accent); font-size: var(--sds-fs-h2); margin-bottom: var(--sds-sp-4);
+}
+.sds-decision > h3::before {
+  content: ""; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--sds-accent); flex: none;
+}
+.sds-ask { counter-increment: ask; padding: var(--sds-sp-3) 0; border-top: 1px solid var(--sds-rule); }
+.sds-ask:first-of-type { border-top: 0; padding-top: 0; }
+.sds-ask-line { display: flex; gap: var(--sds-sp-3); align-items: baseline; }
+.sds-ask-no {
+  flex: none; width: 1.6em; height: 1.6em; display: grid; place-items: center;
+  border-radius: 50%; background: var(--sds-accent-bg); color: var(--sds-accent);
+  font-size: var(--sds-fs-small); font-weight: var(--sds-fw-bold);
+}
+.sds-ask-text { font-weight: var(--sds-fw-medium); font-size: 15px; }
+.sds-ask-why { margin: var(--sds-sp-2) 0 0 calc(1.6em + var(--sds-sp-3)); color: var(--sds-ink-2); font-size: var(--sds-fs-small); }
+.sds-ask-meta { margin: var(--sds-sp-2) 0 0 calc(1.6em + var(--sds-sp-3)); font-size: var(--sds-fs-micro); color: var(--sds-ink-3); }
+
+/* ------------------------------------------------------------- KPI tiles */
+.sds-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: var(--sds-sp-3); }
+.sds-tile {
+  background: var(--sds-surface); border: 1px solid var(--sds-rule);
+  border-radius: var(--sds-r-2); padding: var(--sds-sp-4);
+}
+.sds-tile-label { font-size: var(--sds-fs-micro); color: var(--sds-ink-3); text-transform: uppercase; letter-spacing: .04em; }
+.sds-tile-value { font-size: 30px; font-weight: var(--sds-fw-bold); letter-spacing: var(--sds-tracking-tight); margin-top: var(--sds-sp-1); }
+.sds-tile-value .u { font-size: 15px; font-weight: var(--sds-fw-medium); color: var(--sds-ink-2); margin-left: 2px; }
+.sds-tile-note { font-size: var(--sds-fs-micro); color: var(--sds-ink-3); margin-top: var(--sds-sp-1); }
+.sds-tile[data-state="good"] { border-left: 3px solid var(--sds-good); }
+.sds-tile[data-state="warn"] { border-left: 3px solid var(--sds-warn); }
+.sds-tile[data-state="crit"] { border-left: 3px solid var(--sds-crit); }
+
+/* --------------------------------------------------------------- bullets */
+.sds-bullets { list-style: none; padding: 0; }
+.sds-bullets > li { position: relative; padding-left: var(--sds-sp-4); margin-bottom: var(--sds-sp-2); max-width: var(--sds-prose-max); }
+.sds-bullets > li::before {
+  content: ""; position: absolute; left: 3px; top: .62em;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--sds-rule-firm);
+}
+.sds-bullets > li[data-emph="1"]::before { background: var(--sds-accent); }
+.sds-bullets > li[data-emph="1"] { font-weight: var(--sds-fw-medium); }
+
+/* --------------------------------------------------------------- callout */
+.sds-callout {
+  border-left: 3px solid var(--sds-info); background: var(--sds-info-bg);
+  padding: var(--sds-sp-4); border-radius: 0 var(--sds-r-2) var(--sds-r-2) 0;
+}
+.sds-callout[data-kind="warn"] { border-color: var(--sds-warn); background: var(--sds-warn-bg); }
+.sds-callout[data-kind="crit"] { border-color: var(--sds-crit); background: var(--sds-crit-bg); }
+.sds-callout[data-kind="good"] { border-color: var(--sds-good); background: var(--sds-good-bg); }
+.sds-callout > .t { font-weight: var(--sds-fw-bold); margin-bottom: var(--sds-sp-1); }
+
+/* ----------------------------------------------------------------- table */
+.sds-grain {
+  font-size: var(--sds-fs-micro); color: var(--sds-ink-2);
+  background: var(--sds-sunk); border-radius: var(--sds-r-1);
+  padding: 3px var(--sds-sp-2); display: inline-block; margin-bottom: var(--sds-sp-2);
+  font-family: var(--sds-font-mono);
+}
+.sds-caption { font-size: var(--sds-fs-small); color: var(--sds-ink-2); margin-bottom: var(--sds-sp-2); max-width: var(--sds-prose-max); }
+.sds-tablebar { display: flex; flex-wrap: wrap; gap: var(--sds-sp-2); align-items: center; margin-bottom: var(--sds-sp-2); }
+.sds-search {
+  font: inherit; font-size: var(--sds-fs-small); padding: 5px var(--sds-sp-2);
+  border: 1px solid var(--sds-rule-firm); border-radius: var(--sds-r-1);
+  background: var(--sds-surface); color: var(--sds-ink); min-width: 190px;
+}
+.sds-btn {
+  font: inherit; font-size: var(--sds-fs-small); padding: 5px var(--sds-sp-3);
+  border: 1px solid var(--sds-rule-firm); border-radius: var(--sds-r-1);
+  background: var(--sds-surface); color: var(--sds-ink-2); cursor: pointer;
+}
+.sds-btn:hover { border-color: var(--sds-accent); color: var(--sds-accent); }
+.sds-btn[aria-pressed="true"] { background: var(--sds-accent-bg); border-color: var(--sds-accent); color: var(--sds-accent); }
+.sds-rowcount { font-size: var(--sds-fs-micro); color: var(--sds-ink-3); margin-left: auto; font-variant-numeric: tabular-nums; }
+
+/* Wide content scrolls inside its own box. The page body never scrolls
+   sideways. */
+.sds-tablewrap {
+  overflow: auto; max-height: var(--sds-table-max-h);
+  border: 1px solid var(--sds-rule); border-radius: var(--sds-r-2);
+  background: var(--sds-surface);
+}
+table.sds-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: var(--sds-fs-small); }
+table.sds-table thead th {
+  position: sticky; top: 0; z-index: 2;
+  background: var(--sds-surface); color: var(--sds-ink-2);
+  text-align: left; font-weight: var(--sds-fw-bold); white-space: nowrap;
+  padding: var(--sds-sp-2) var(--sds-sp-3);
+  border-bottom: 2px solid var(--sds-accent);
+}
+table.sds-table tbody td {
+  padding: var(--sds-sp-2) var(--sds-sp-3);
+  border-bottom: 1px solid var(--sds-rule);
+  vertical-align: top;
+}
+table.sds-table tbody tr:last-child td { border-bottom: 0; }
+table.sds-table tbody tr:hover td { background: var(--sds-sunk); }
+table.sds-table td.num, table.sds-table th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.sds-table td.wrap { white-space: normal; min-width: 16ch; }
+table.sds-table th.sticky-col, table.sds-table td.sticky-col {
+  position: sticky; left: 0; background: var(--sds-surface); z-index: 1;
+  border-right: 1px solid var(--sds-rule);
+}
+table.sds-table thead th.sticky-col { z-index: 3; }
+table.sds-table tr[hidden] { display: none; }
+/* Columns hidden by the core/all toggle. */
+table.sds-table [data-col-extra="1"] { display: none; }
+.sds-tablewrap[data-cols="all"] [data-col-extra="1"] { display: table-cell; }
+
+/* ---------------------------------------------------------------- badges */
+.sds-badge {
+  display: inline-block; padding: 1px 7px; border-radius: 999px;
+  font-size: var(--sds-fs-micro); font-weight: var(--sds-fw-medium); white-space: nowrap;
+}
+.sds-badge[data-s="ok"]   { background: var(--sds-good-bg); color: var(--sds-good); }
+.sds-badge[data-s="warn"] { background: var(--sds-warn-bg); color: var(--sds-warn); }
+.sds-badge[data-s="crit"] { background: var(--sds-crit-bg); color: var(--sds-crit); }
+.sds-badge[data-s="info"] { background: var(--sds-info-bg); color: var(--sds-info); }
+.sds-badge[data-s="na"]   { background: var(--sds-na-bg);   color: var(--sds-na); }
+
+/* ---------------------------------------------------------------- charts */
+/* The takeaway renders ABOVE the chart, in bold. A chart without a stated
+   conclusion is a puzzle, so the renderer refuses to emit one. */
+.sds-takeaway {
+  font-weight: var(--sds-fw-bold); font-size: 15px;
+  margin-bottom: var(--sds-sp-3); max-width: var(--sds-prose-max);
+}
+.sds-chart { background: var(--sds-surface); border: 1px solid var(--sds-rule); border-radius: var(--sds-r-2); padding: var(--sds-sp-4); }
+.sds-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sds-chart .axis line, .sds-chart .axis path { stroke: var(--sds-rule); }
+.sds-chart .grid line { stroke: var(--sds-rule); stroke-dasharray: 2 3; }
+.sds-chart text { fill: var(--sds-ink-2); font-size: 11px; font-family: var(--sds-font-sans); }
+.sds-chart .lbl-value { fill: var(--sds-ink); font-weight: var(--sds-fw-medium); }
+.sds-chart .s1 { fill: var(--sds-series-1); }  .sds-chart .stroke-s1 { stroke: var(--sds-series-1); }
+.sds-chart .s2 { fill: var(--sds-series-2); }  .sds-chart .stroke-s2 { stroke: var(--sds-series-2); }
+.sds-chart .s3 { fill: var(--sds-series-3); }  .sds-chart .stroke-s3 { stroke: var(--sds-series-3); }
+.sds-chart .s4 { fill: var(--sds-series-4); }  .sds-chart .stroke-s4 { stroke: var(--sds-series-4); }
+.sds-legend { display: flex; flex-wrap: wrap; gap: var(--sds-sp-2) var(--sds-sp-4); margin-top: var(--sds-sp-3); font-size: var(--sds-fs-micro); color: var(--sds-ink-2); }
+.sds-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.sds-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+
+/* heat grid */
+.sds-heat { border-collapse: separate; border-spacing: 2px; font-size: var(--sds-fs-micro); }
+.sds-heat th { color: var(--sds-ink-3); font-weight: var(--sds-fw-medium); padding: 2px 6px; text-align: left; white-space: nowrap; }
+.sds-heat td { text-align: center; padding: var(--sds-sp-2) var(--sds-sp-1); border-radius: var(--sds-r-1); min-width: 40px; color: var(--sds-ink); }
+.sds-heat td[data-h="0"] { background: var(--sds-sunk); color: var(--sds-ink-3); }
+.sds-heat td[data-h="1"] { background: var(--sds-ramp-1); }
+.sds-heat td[data-h="2"] { background: var(--sds-ramp-2); }
+.sds-heat td[data-h="3"] { background: var(--sds-ramp-3); color: #fff; }
+.sds-heat td[data-h="4"] { background: var(--sds-ramp-4); color: #fff; }
+.sds-heat td[data-flag="gap"]   { outline: 2px solid var(--sds-crit); }
+.sds-heat td[data-flag="conc"]  { outline: 2px solid var(--sds-warn); }
+.sds-flagkey { display: flex; gap: var(--sds-sp-4); font-size: var(--sds-fs-micro); color: var(--sds-ink-3); margin-top: var(--sds-sp-2); }
+
+/* --------------------------------------------------------------- footer */
+.sds-foot {
+  margin-top: var(--sds-sp-9); padding-top: var(--sds-sp-4);
+  border-top: 1px solid var(--sds-rule);
+  font-size: var(--sds-fs-micro); color: var(--sds-ink-3);
+  display: flex; flex-wrap: wrap; gap: var(--sds-sp-2) var(--sds-sp-5);
+}
+.sds-foot code { color: var(--sds-ink-2); }
+
+/* ---------------------------------------------------------------- print */
+/* These documents get printed and forwarded as PDF. Treat print as a first
+   class target, not an afterthought. */
+@media print {
+  @page { size: A4; margin: 14mm 12mm; }
+  body { background: #fff; font-size: 10.5pt; }
+  .sds-page { max-width: none; padding: 0; }
+  .sds-toc, .sds-tablebar, .sds-btn, .sds-search { display: none !important; }
+  .sds-tablewrap { max-height: none; overflow: visible; border-radius: 0; }
+  table.sds-table thead th { position: static; }
+  /* Print shows every column: paper has no toggle. */
+  table.sds-table [data-col-extra="1"] { display: table-cell !important; }
+  .sds-section { break-inside: auto; page-break-inside: auto; margin-top: 18pt; }
+  .sds-section > h2 { break-after: avoid; page-break-after: avoid; }
+  .sds-decision, .sds-tile, .sds-chart, .sds-callout { break-inside: avoid; page-break-inside: avoid; }
+  tr, .sds-ask { break-inside: avoid; page-break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+  .sds-decision { box-shadow: none; }
+}
+
+/* -------------------------------------------------------------- narrow */
+@media (max-width: 720px) {
+  .sds-page { padding: var(--sds-sp-5) var(--sds-sp-4) var(--sds-sp-8); }
+  .sds-doctitle { font-size: 28px; }
+  .sds-toc ol { columns: 1; }
+  .sds-control { gap: var(--sds-sp-1) var(--sds-sp-4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+</style>
+</head>
+<body>
+<div class="sds-page">
+<header><h1 class="sds-doctitle">2026 SOM Team R&amp;R</h1><div class="sds-subtitle">역할과 책임 정의 · 15명 · 4 Sub Team</div><dl class="sds-control"><div><dt>버전</dt><dd>v1.0</dd></div><div><dt>기준일</dt><dd>2026-09-09</dd></div><div><dt>대상 조직</dt><dd>SOM Unit</dd></div><div><dt>작성</dt><dd>Kyeong Je Kim</dd></div><div><dt>승인</dt><dd>TODO</dd></div><div><dt>문서 등급</dt><dd>Internal</dd></div></dl></header><nav class="sds-toc" aria-label="목차"><ol><li><span class="n">1</span><a href="#decision">결정 요청</a></li><li><span class="n">2</span><a href="#overview">한눈에</a><span class="sds-derived-tag">derived</span></li><li><span class="n">3</span><a href="#org">조직 스냅샷</a></li><li><span class="n">4</span><a href="#strategy">2026 전략 핵심 지점</a></li><li><span class="n">5</span><a href="#matrix">인원별 R&amp;R 매트릭스</a></li><li><span class="n">6</span><a href="#detail-business-operations-bo">Business Operations (BO) 상세</a></li><li><span class="n">7</span><a href="#detail-business-platform-bpm">Business Platform (BPM) 상세</a></li><li><span class="n">8</span><a href="#detail-krs-kevin-hahyung">KRS 전담 (Kevin &amp; Hahyung)</a></li><li><span class="n">9</span><a href="#detail-strategic-solutions-ssm">Strategic Solutions (SSM) 상세</a></li><li><span class="n">10</span><a href="#coverage">롤 커버리지</a><span class="sds-derived-tag">derived</span></li><li><span class="n">11</span><a href="#risks">리스크 · 전제</a></li><li><span class="n">12</span><a href="#sources">부록 — 원천 데이터</a></li></ol></nav><section class="sds-section" id="decision"><h2><span class="n">1</span><span class="sds-ko">결정 요청</span><span class="sds-en">Decision Requests</span></h2><div class="sds-intro">이 문서로 승인받을 사항이다. 나머지 절은 근거다.</div><div class="sds-block"><div class="sds-decision"><h3>결정 요청</h3><div class="sds-ask"><div class="sds-ask-line"><span class="sds-ask-no">1</span><span class="sds-ask-text">TODO 승인받을 사항을 한 문장으로 쓰라. 예: 시간 비중이 미확정인 인원의 배분을 확정한다.</span></div><div class="sds-ask-why">TODO 근거를 쓰라. 파생 지표와 표를 인용하라.</div><div class="sds-ask-meta">요청 대상 TODO</div></div></div></div></section><section class="sds-section" id="overview"><h2><span class="n">2</span>한눈에<span class="sds-derived-tag">derived</span></h2><div class="sds-block"><h3>한눈에<span class="sds-derived-tag">derived</span></h3><div class="sds-tiles"><div class="sds-tile"><div class="sds-tile-label">총 인원</div><div class="sds-tile-value">15<span class="u">명</span></div></div><div class="sds-tile"><div class="sds-tile-label">Sub Team</div><div class="sds-tile-value">4<span class="u">개</span></div></div><div class="sds-tile"><div class="sds-tile-label">정의된 핵심 과업</div><div class="sds-tile-value">45<span class="u">건</span></div></div><div class="sds-tile" data-state="warn"><div class="sds-tile-label">시간 비중 미확정</div><div class="sds-tile-value">7<span class="u">명</span></div><div class="sds-tile-note">숫자 배분이 없는 인원</div></div></div></div><div class="sds-block"><div class="sds-takeaway">인원의 6/15이 Business Platform Management (BPM) 한 팀에 있다.</div><figure class="sds-chart" style="margin:0" data-sds-src="sheet:SOM Team 전체 현황#Sub Team"><svg viewBox="0 0 880 150" role="img" preserveAspectRatio="none"><text x="250" y="33.0" text-anchor="end">Business Operations (BO)</text><rect x="260" y="20" width="528" height="18" rx="2" fill="var(--sds-sunk)"/><rect class="s1" x="260" y="20" width="211.2" height="18" rx="2"/><text class="lbl-value" x="479.2" y="33.0">3명</text><text x="250" y="63.0" text-anchor="end">Business Platform Management (BPM)</text><rect x="260" y="50" width="528" height="18" rx="2" fill="var(--sds-sunk)"/><rect class="s1" x="260" y="50" width="422.4" height="18" rx="2"/><text class="lbl-value" x="690.4" y="63.0">6명</text><text x="250" y="93.0" text-anchor="end">BPM - K Retail Solutions (KRS)</text><rect x="260" y="80" width="528" height="18" rx="2" fill="var(--sds-sunk)"/><rect class="s1" x="260" y="80" width="140.8" height="18" rx="2"/><text class="lbl-value" x="408.8" y="93.0">2명</text><text x="250" y="123.0" text-anchor="end">Strategic Solution Management (SSM)</text><rect x="260" y="110" width="528" height="18" rx="2" fill="var(--sds-sunk)"/><rect class="s1" x="260" y="110" width="281.6" height="18" rx="2"/><text class="lbl-value" x="549.6" y="123.0">4명</text></svg></figure></div></section><section class="sds-section" id="org"><h2><span class="n">3</span>조직 스냅샷</h2><div class="sds-block"><h3>조직 스냅샷<span class="sds-derived-tag">derived</span></h3><div class="sds-grain">행 단위: 행 1개 = Sub Team 1개</div><div class="sds-tablebar" data-for="t1"><span class="sds-rowcount">4 rows</span></div><div class="sds-tablewrap" data-table-id="t1" data-cols="core"><table class="sds-table"><thead><tr><th class="sticky-col">Sub Team</th><th class="num">인원</th><th>구성</th><th>리드 직책 보유</th></tr></thead><tbody><tr><td class="sticky-col">Business Operations (BO)</td><td class="num">3명</td><td class="wrap">Kyeong Je Kim, Donghun Kim, Sukyung Seo</td><td class="wrap">Kyeong Je Kim</td></tr><tr><td class="sticky-col">Business Platform Management (BPM)</td><td class="num">6명</td><td class="wrap">Chris Kim, Sohyun Jeon, Inha Jung, Eunbi Kang, Yunji Lim, Kristine Park</td><td class="wrap">Chris Kim</td></tr><tr><td class="sticky-col">BPM - K Retail Solutions (KRS)</td><td class="num">2명</td><td class="wrap">Kevin Nho, Hahyung Jung</td><td class="wrap">Kevin Nho</td></tr><tr><td class="sticky-col">Strategic Solution Management (SSM)</td><td class="num">4명</td><td class="wrap">Harry Kwon, DK Kang, Hye Jin Ryoo, Siun Park</td><td class="wrap">Harry Kwon, DK Kang</td></tr></tbody></table></div></div></section><section class="sds-section" id="strategy"><h2><span class="n">4</span>2026 전략 핵심 지점</h2><div class="sds-block"><h3>2026 전략 핵심 지점</h3><div class="sds-grain">행 단위: 행 1개 = 전략 항목 1건</div><div class="sds-tablebar" data-for="t2"><span class="sds-rowcount">9 rows</span></div><div class="sds-tablewrap" data-table-id="t2" data-cols="core"><table class="sds-table"><thead><tr><th class="sticky-col">구분</th><th>내용</th><th>담당 팀/인물</th></tr></thead><tbody><tr><td class="sticky-col">조직 목표</td><td class="wrap">① 자동화(RPA/PI) 추진으로 운영 효율화 ② 데이터 기반 의사결정 강화 ③ AI 도입으로 신차원 혁신 ④ 신규 비즈니스(KRS, 플랫폼) 성공적 런칭</td><td class="wrap">전 팀 (특히 BO 주도)</td></tr><tr><td class="sticky-col">BO Team 전략</td><td class="wrap">데이터 거버넌스 강화 → 프로세스 자동화 → AI/예측 분석 → 팀 역량 최적화</td><td class="wrap">Kyeong Je Kim 리드</td></tr><tr><td class="sticky-col">BPM Team 전략</td><td class="wrap">플랫폼 안정성 + 신규 런칭 가속 + 운영 효율화 + 기술 혁신(AI/자동화)</td><td class="wrap">Chris Kim (기술) + Sohyun Jeon (전략) + 운영팀</td></tr><tr><td class="sticky-col">KRS 전담 전략</td><td class="wrap">Phase 1.5/2 완성 + HW/SW/Ops/Payment 통합 + 장기 로드맵 수립</td><td class="wrap">Kevin Nho (전략) + Hahyung Jung (운영)</td></tr><tr><td class="sticky-col">SSM 전략</td><td class="wrap">KRS/CRM/Sales Platform 등 전략 프로젝트 추진 + 데이터 기반 성과 측정</td><td class="wrap">Harry Kwon (PM) + 팀원</td></tr><tr><td class="sticky-col">Cross-Functional 협업</td><td class="wrap">BO의 데이터/자동화 역량 → BPM 플랫폼에 적용 → SSM 프로젝트 성공 지원 → 전사 효율화</td><td class="wrap">전 팀</td></tr><tr><td class="sticky-col">인재 개발 방향</td><td class="wrap">Donghun Kim: 운영→고부가가치로 전환 | 전 팀: 반복업무 자동화→전략 업무 시프트</td><td class="wrap">Kyeong Je Kim + 각 리더</td></tr><tr><td class="sticky-col">주요 리스크</td><td class="wrap">① 20개 신규 프로젝트 동시 추진 시 리소스 부족 ② 자동화 구현 난도 높음 ③ 팀 역량 개발 시간 필요</td><td class="wrap">Harry Kwon + 리더들</td></tr><tr><td class="sticky-col">2026 성공 조건</td><td class="wrap">① 명확한 우선순위 관리 ② Cross-functional 협업 강화 ③ 자동화 구현 가속화 ④ 데이터 품질 관리 철저</td><td class="wrap">전 리더 (Kyeong, Chris, Harry)</td></tr></tbody></table></div></div></section><section class="sds-section" id="matrix"><h2><span class="n">5</span>인원별 R&amp;R 매트릭스</h2><div class="sds-intro">원본 워크북의 전체 현황 시트를 그대로 옮긴 것이다.</div><div class="sds-block"><h3>인원별 R&amp;R 매트릭스</h3><div class="sds-grain">행 단위: 행 1개 = 팀원 1명</div><div class="sds-caption">핵심 과업 뒤의 괄호 백분율은 해당 과업의 시간 비중이다. 시간 비중 열이 숫자가 아닌 인원은 배분이 아직 확정되지 않았다.</div><div class="sds-tablebar" data-for="t3"><input class="sds-search" type="search" placeholder="검색" aria-label="검색"><span class="sds-rowcount">15 rows</span></div><div class="sds-tablewrap" data-table-id="t3" data-cols="core"><table class="sds-table"><thead><tr><th class="num">순번</th><th class="sticky-col">팀원</th><th>직책</th><th>Sub Team</th><th>핵심 역할</th><th>핵심 과업 1</th><th>핵심 과업 2</th><th>핵심 과업 3</th><th>세부 업무 1</th><th>세부 업무 2</th><th>세부 업무 3</th><th>시간 비중</th><th>역할 인사이트</th></tr></thead><tbody><tr data-f='["Kyeong Je Kim","Assistant Manager, E-Commerce Data Analyst","Business Operations (BO)","Data & Process Innovation Leader"]'><td class="num">1</td><td class="sticky-col">Kyeong Je Kim</td><td class="wrap">Assistant Manager, E-Commerce Data Analyst</td><td>Business Operations (BO)</td><td class="wrap">Data &amp; Process Innovation Leader</td><td class="wrap">Data-Driven Decision Support &amp; Governance (20%)</td><td class="wrap">Process Re-engineering &amp; Automation (20%)</td><td class="wrap">AI-Powered Efficiency &amp; Innovation (20%)</td><td class="wrap">KPI 단일 정의 체계 운영</td><td class="wrap">성과 분석 및 인사이트 보고</td><td class="wrap">프로세스 자동화 구현</td><td>5개 기능 균형</td><td class="wrap">전술적 실행→전략적 설계로 진화, RPA/PI/AI 오너십, 팀 리더로서 역량 조정 책임</td></tr><tr data-f='["Donghun Kim","Business Operations Analyst","Business Operations (BO)","Operational Excellence Manager"]'><td class="num">2</td><td class="sticky-col">Donghun Kim</td><td class="wrap">Business Operations Analyst</td><td>Business Operations (BO)</td><td class="wrap">Operational Excellence Manager</td><td class="wrap">Operational Excellence &amp; Efficiency (30%)</td><td class="wrap">Sales Strategy &amp; Performance Management (25%)</td><td class="wrap">Cross-Functional Collaboration (20%)</td><td class="wrap">Vivace 데이터 관리 지원</td><td class="wrap">프로세스 자동화 구현</td><td class="wrap">BI 대시보드 보안 및 액세스 관리</td><td>30/25/20/15/10</td><td class="wrap">기술 역량과 비즈니스 전략의 가교, 운영 유지보수에서 고부가가치 업무로 전환 필요, 부서 간 가교 역할</td></tr><tr data-f='["Sukyung Seo","Demand Planner","Business Operations (BO)","Process Automation & Predictive Analytics Strategist"]'><td class="num">3</td><td class="sticky-col">Sukyung Seo</td><td class="wrap">Demand Planner</td><td>Business Operations (BO)</td><td class="wrap">Process Automation &amp; Predictive Analytics Strategist</td><td class="wrap">Process Automation &amp; Optimization (30%)</td><td class="wrap">Data Analysis &amp; Reporting (25%)</td><td class="wrap">Methodology Enhancement (20%)</td><td class="wrap">Smartsheet→SharePoint 마이그레이션 리드</td><td class="wrap">자동화 솔루션 배포 및 효과 측정</td><td class="wrap">POS 데이터 분석 및 예측 인사이트 도출</td><td>30/25/20/20/20</td><td class="wrap">S&amp;OP 중추 역할, 프로세스 최적화와 고급 분석의 교점, 예측 기반 의사결정 주도, 보고서는 저수준 업무로 탈피 필요</td></tr><tr data-f='["Chris Kim","Senior Manager, E-commerce Administrator","Business Platform Management (BPM)","Platform Technology Leadership"]'><td class="num">4</td><td class="sticky-col">Chris Kim</td><td class="wrap">Senior Manager, E-commerce Administrator</td><td>Business Platform Management (BPM)</td><td class="wrap">Platform Technology Leadership</td><td class="wrap">Platform Development &amp; Tech Innovation (30%)</td><td class="wrap">New Business Launch &amp; System Integration (40%)</td><td class="wrap">Infrastructure Management &amp; Stability (20%)</td><td class="wrap">Odoo16 커스텀 모듈 개발 (Python/XML)</td><td class="wrap">신규 브랜드 Multi-company 시스템 구축</td><td class="wrap">AWS 인프라 및 PostgreSQL 모니터링</td><td>30/40/20/10</td><td class="wrap">Full-stack 개발부터 인프라까지 전방위 역량, AI 도입으로 개발 생산성 향상, 매출 성장에 직접 기여, 플랫폼 기술 리더</td></tr><tr data-f='["Sohyun Jeon","Ecommerce Planner","Business Platform Management (BPM)","E-commerce Platform Strategy & Ownership"]'><td class="num">5</td><td class="sticky-col">Sohyun Jeon</td><td class="wrap">Ecommerce Planner</td><td>Business Platform Management (BPM)</td><td class="wrap">E-commerce Platform Strategy &amp; Ownership</td><td class="wrap">Ecommerce Platform Strategy &amp; Ownership (20%)</td><td class="wrap">Cross-Functional Project Management (20%)</td><td class="wrap">Data &amp; Analytics-Driven Decision Making (20%)</td><td class="wrap">IVYKISS 플랫폼 중장기 로드맵 수립</td><td class="wrap">신규 기능 우선순위 정의 및 실행</td><td class="wrap">GA4/GTM 기반 유저 행동 분석 및 KPI 관리</td><td>균형 배치</td><td class="wrap">플랫폼 전략가, UX/데이터/운영 통합 관점, 자동화와 데이터로 지속 성장 구조 구축, 고객 중심 혁신</td></tr><tr data-f='["Inha Jung","Ecommerce Planner","Business Platform Management (BPM)","Platform Operations & Development Bridge"]'><td class="num">6</td><td class="sticky-col">Inha Jung</td><td class="wrap">Ecommerce Planner</td><td>Business Platform Management (BPM)</td><td class="wrap">Platform Operations &amp; Development Bridge</td><td class="wrap">B2B E-Commerce Platform Operation (20%)</td><td class="wrap">Project Management &amp; QA (20%)</td><td class="wrap">Automation &amp; Operational Efficiency (20%)</td><td class="wrap">플랫폼 운영 안정성 및 CS 이슈 처리</td><td class="wrap">개발 과제 정의 및 일정·범위 관리</td><td class="wrap">반복 업무 자동화 방안 기획 및 설계</td><td>균형 배치</td><td class="wrap">운영 경험을 바탕으로 개발 기획에 참여, 운영/개발/자동화/세일즈 연결, 실무 중심 개선 주도</td></tr><tr data-f='["Eunbi Kang","UI UX Designer","Business Platform Management (BPM)","Design Operations & Quality Assurance"]'><td class="num">7</td><td class="sticky-col">Eunbi Kang</td><td class="wrap">UI UX Designer</td><td>Business Platform Management (BPM)</td><td class="wrap">Design Operations &amp; Quality Assurance</td><td class="wrap">Product Design &amp; Marketing Content (30%)</td><td class="wrap">Technical Design Review &amp; QA (20%)</td><td class="wrap">Design Guideline &amp; Standardization (20%)</td><td class="wrap">UI/UX 디자인 직접 제작 및 마케팅 자산</td><td class="wrap">벤더 결과물 코드 수준 검증 및 기술 QA</td><td class="wrap">High-Fidelity 디자인 가이드라인 설계</td><td>30/20/20/15/15</td><td class="wrap">디자인 오퍼레이션 전문가, 실무 기반 가이드로 벤더 오류 감소, 기술-디자인 브릿지, 자산화로 효율화</td></tr><tr data-f='["Yunji Lim","E-commerce Content Operations Specialist","Business Platform Management (BPM)","Content & Promotion Operations Manager"]'><td class="num">8</td><td class="sticky-col">Yunji Lim</td><td class="wrap">E-commerce Content Operations Specialist</td><td>Business Platform Management (BPM)</td><td class="wrap">Content &amp; Promotion Operations Manager</td><td class="wrap">Content &amp; Visual Asset Design (20%)</td><td class="wrap">IVYKISS UX/UI Design (20%)</td><td class="wrap">Design Automation &amp; Quality Control (20%)</td><td class="wrap">프로모션·마케팅용 콘텐츠 및 비주얼 제작</td><td class="wrap">프로모션·캠페인 기획 및 일정 조율 실행</td><td class="wrap">운영 QA, 플랫폼 이슈 대응, 콘텐츠 상시 관리</td><td>균형 배치</td><td class="wrap">콘텐츠 제작·운영·QA·CS 전 과정 수행, 기획 의도와 실제 결과물 간 간극 최소화, 자동화로 지속 가능한 구조</td></tr><tr data-f='["Kristine Park","Specialist, B2B E-Commerce Planning","Business Platform Management (BPM)","Digital Operations & GTM Coordinator"]'><td class="num">9</td><td class="sticky-col">Kristine Park</td><td class="wrap">Specialist, B2B E-Commerce Planning</td><td>Business Platform Management (BPM)</td><td class="wrap">Digital Operations &amp; GTM Coordinator</td><td class="wrap">New Product Launch &amp; Listing Management (30%)</td><td class="wrap">Digital Communication &amp; Marketing (20%)</td><td class="wrap">Platform Quality Management (QA) (20%)</td><td class="wrap">신규 제품 출시 디지털 준비 및 일관성 관리</td><td class="wrap">B2B·B2C 메시징 계획·스케줄·성과 추적</td><td class="wrap">신규 기능 QA 및 배포 안정성 확보</td><td>30/20/20/15/15</td><td class="wrap">제품 출시·커뮤니케이션·플랫폼·고객 데이터 통합 관리, 채널 간 정보 정확성 확보, 다부서 협업 조율</td></tr><tr data-f='["Kevin Nho","Senior Manager, Business Project/Program Management","BPM - K Retail Solutions (KRS)","Platform Product Owner & Strategy Leader"]'><td class="num">10</td><td class="sticky-col">Kevin Nho</td><td class="wrap">Senior Manager, Business Project/Program Management</td><td>BPM - K Retail Solutions (KRS)</td><td class="wrap">Platform Product Owner &amp; Strategy Leader</td><td class="wrap">Business &amp; Technical Requirement Definition (20%)</td><td class="wrap">Product Roadmap &amp; Lifecycle Management (20%)</td><td class="wrap">Product Research &amp; Innovation (20%)</td><td class="wrap">KRS Dev &amp; UAT 계획 및 관리</td><td class="wrap">HW 선정·조달·테스트·배포 프로세스 운영</td><td class="wrap">결제 시스템 통합 및 운영 워크플로우 설계</td><td>균형 배치</td><td class="wrap">KRS 플랫폼 오너, HW+SW+Ops+Payment 통합 관리, Business-Technology Strategist, 장기 플랫폼 로드맵 수립</td></tr><tr data-f='["Hahyung Jung","Business Analyst","BPM - K Retail Solutions (KRS)","Operating System Architect & Data Integration Lead"]'><td class="num">11</td><td class="sticky-col">Hahyung Jung</td><td class="wrap">Business Analyst</td><td>BPM - K Retail Solutions (KRS)</td><td class="wrap">Operating System Architect &amp; Data Integration Lead</td><td class="wrap">Operating System Design &amp; Integration (20%)</td><td class="wrap">Data Operations &amp; SAP/MM Management (20%)</td><td class="wrap">POS Software &amp; Platform Operations (20%)</td><td class="wrap">POS↔KRS Admin↔Snowflake↔SAP 통합 아키텍처 설계</td><td class="wrap">Master Data(Material/Vendor/Store/Price) 무결성 관리</td><td class="wrap">POS 운영 안정성·표준화 및 데이터 품질 모니터링</td><td>균형 배치</td><td class="wrap">시스템 통합 아키텍트, POS-시스템-데이터-SAP 연결의 중추, 표준 정의→개발·테스트→데이터 변경→일관성 유지 사이클 책임</td></tr><tr data-f='["Harry Kwon","Director, Project Management","Strategic Solution Management (SSM)","Strategic Project & Program Leadership"]'><td class="num">12</td><td class="sticky-col">Harry Kwon</td><td class="wrap">Director, Project Management</td><td>Strategic Solution Management (SSM)</td><td class="wrap">Strategic Project &amp; Program Leadership</td><td class="wrap">Project Planning, Execution &amp; Control (20%)</td><td class="wrap">Stakeholder Communication &amp; Risk Management (20%)</td><td class="wrap">Solution Operations Management (10%)</td><td class="wrap">KRS Phase 1 시스템·비즈니스 런칭 리드</td><td class="wrap">KRS Phase 2 프로젝트 기획 및 관리</td><td class="wrap">CRM-Service 구현, Sales Platform Revamp 총괄</td><td>20×5+10×2</td><td class="wrap">SSM 리더, 핵심 전략 프로젝트 주도, 프로젝트 실행과 솔루션 운영 이중 책임</td></tr><tr data-f='["DK Kang","Manager, Project and Operation","Strategic Solution Management (SSM)","CRM Project & Data Analytics Manager"]'><td class="num">13</td><td class="sticky-col">DK Kang</td><td class="wrap">Manager, Project and Operation</td><td>Strategic Solution Management (SSM)</td><td class="wrap">CRM Project &amp; Data Analytics Manager</td><td class="wrap">Project Plan Development &amp; Scope (20%)</td><td class="wrap">Data Analysis &amp; Performance Measurement (40%)</td><td class="wrap">Cross-Functional Collaboration (10%)</td><td class="wrap">CRM 프로젝트 계획·범위·리스크 관리</td><td class="wrap">Power BI/Snowflake 기반 성과 데이터 분석</td><td class="wrap">Nail Division 예측 및 재고 관리, Dashboard 유지</td><td>20/20/40/10/10</td><td class="wrap">CRM 프로젝트 매니저, 데이터 분석 리더, 비즈니스 요구사항 충족 검증 주도</td></tr><tr data-f='["Hye Jin Ryoo","Specialist, Project Management","Strategic Solution Management (SSM)","Business Requirements Analyst & Solution Quality Lead"]'><td class="num">14</td><td class="sticky-col">Hye Jin Ryoo</td><td class="wrap">Specialist, Project Management</td><td>Strategic Solution Management (SSM)</td><td class="wrap">Business Requirements Analyst &amp; Solution Quality Lead</td><td class="wrap">Stakeholder Requirement Analysis (20%)</td><td class="wrap">Market Research &amp; Competitive Analysis (20%)</td><td class="wrap">Development Coordination &amp; Testing (20%)</td><td class="wrap">KRS Phase 1/2 기능 정의 및 BA 지원</td><td class="wrap">KRS 운영 안정화를 위한 기능 개선 정의</td><td class="wrap">CRM-Service 구현 기능 명세 및 검증</td><td>20/20/20/20/10/10</td><td class="wrap">요구사항 정의 전문가, BA 리더, 비즈니스 니즈와 기술 솔루션 연결</td></tr><tr data-f='["Siun Park","Specialist, Project Management","Strategic Solution Management (SSM)","Project Execution & Solution Operations Manager"]'><td class="num">15</td><td class="sticky-col">Siun Park</td><td class="wrap">Specialist, Project Management</td><td>Strategic Solution Management (SSM)</td><td class="wrap">Project Execution &amp; Solution Operations Manager</td><td class="wrap">Project Planning &amp; Execution (20%)</td><td class="wrap">Scope Definition &amp; Deliverable Management (20%)</td><td class="wrap">Progress Tracking &amp; Stakeholder Engagement (10%)</td><td class="wrap">KRS Phase 1 프로젝트 지원 및 운영 협조</td><td class="wrap">Sales Platform Revamp 프로젝트 추진</td><td class="wrap">Sales Platform &amp; Mileage Expense 운영 (1차 지원)</td><td>20/20/20/10/30</td><td class="wrap">프로젝트 실행가, 운영 전담자, 프로젝트와 운영 이중 역할</td></tr></tbody></table></div></div></section><section class="sds-section" id="detail-business-operations-bo"><h2><span class="n">6</span>Business Operations (BO) 상세</h2><div class="sds-block"><h3>Business Operations (BO) 상세</h3><div class="sds-caption">3명 · 13개 항목. 열이 인원, 행이 항목이다.</div><div class="sds-tablewrap"><table class="sds-table"><thead><tr><th class="sticky-col">구분</th><th>Kyeong Je Kim</th><th>Donghun Kim</th><th>Sukyung Seo</th></tr></thead><tbody><tr><th class="sticky-col">직책</th><td class="wrap">Assistant Manager, E-Commerce Data Analyst</td><td class="wrap">Business Operations Analyst</td><td class="wrap">Demand Planner</td></tr><tr><th class="sticky-col">핵심 역할</th><td class="wrap">Data &amp; Process Innovation Leader</td><td class="wrap">Operational Excellence Manager</td><td class="wrap">Process Automation &amp; Predictive Analytics Strategist</td></tr><tr><th class="sticky-col">전략 방향</th><td class="wrap">전술적 실행→전략적 설계로 진화</td><td class="wrap">운영 유지보수→고부가가치 업무 전환</td><td class="wrap">프로세스 최적화와 고급 분석의 교점</td></tr><tr><th class="sticky-col">핵심 과업 1</th><td class="wrap">Data-Driven Decision Support &amp; Governance (20%)</td><td class="wrap">Operational Excellence &amp; Efficiency (30%)</td><td class="wrap">Process Automation &amp; Optimization (30%)</td></tr><tr><th class="sticky-col">핵심 과업 2</th><td class="wrap">Process Re-engineering &amp; Automation (20%)</td><td class="wrap">Sales Strategy &amp; Performance Management (25%)</td><td class="wrap">Data Analysis &amp; Reporting (25%)</td></tr><tr><th class="sticky-col">핵심 과업 3</th><td class="wrap">AI-Powered Efficiency &amp; Innovation (20%)</td><td class="wrap">Cross-Functional Collaboration (20%)</td><td class="wrap">Methodology Enhancement (20%)</td></tr><tr><th class="sticky-col">세부 업무 1</th><td class="wrap">KPI 단일 정의 체계 운영</td><td class="wrap">Vivace 데이터 관리 지원</td><td class="wrap">Smartsheet→SharePoint 마이그레이션</td></tr><tr><th class="sticky-col">세부 업무 2</th><td class="wrap">성과 분석 및 인사이트 보고</td><td class="wrap">프로세스 자동화 구현</td><td class="wrap">자동화 솔루션 배포</td></tr><tr><th class="sticky-col">세부 업무 3</th><td class="wrap">프로세스 자동화 구현</td><td class="wrap">BI 대시보드 보안 및 액세스</td><td class="wrap">POS 데이터 분석 및 예측</td></tr><tr><th class="sticky-col">2026년 주요 이니셔티브</th><td class="wrap">①RPA/PI/AI 오너십 강화 ②지식 거버넌스 구축 ③팀 역량 최적화</td><td class="wrap">①Vivace 데이터 고도화 ②KRS MM 운영 표준화 ③고부가가치 프로젝트 집중</td><td class="wrap">①Legacy 마이그레이션 완성 ②자동화 인프라 구축 ③예측 분석 고도화</td></tr><tr><th class="sticky-col">부서 간 협업 주요 상대</th><td class="wrap">전사(SOM 내부, IT, 영업)</td><td class="wrap">Vivace/영업팀, BPM, IT</td><td class="wrap">Sales/Marketing, Finance, Supply Chain</td></tr><tr><th class="sticky-col">역할의 전략적 가치</th><td class="wrap">조직의 데이터 활용 패러다임 전환</td><td class="wrap">기술과 비즈니스를 잇는 가교 역할</td><td class="wrap">S&amp;OP 중추 역할 및 예측 기반 의사결정</td></tr><tr><th class="sticky-col">성공 지표 (KPI)</th><td class="wrap">KPI 정의 표준화율, 자동화 구현건수, AI 도입 효과</td><td class="wrap">프로세스 개선건수, 운영 효율성 증대, 고객 만족도</td><td class="wrap">마이그레이션 완료율, 자동화 공정 단축률, 예측 정확도</td></tr></tbody></table></div></div></section><section class="sds-section" id="detail-business-platform-bpm"><h2><span class="n">7</span>Business Platform (BPM) 상세</h2><div class="sds-block"><h3>Business Platform (BPM) 상세</h3><div class="sds-caption">6명 · 12개 항목. 열이 인원, 행이 항목이다.</div><div class="sds-tablewrap"><table class="sds-table"><thead><tr><th class="sticky-col">구분</th><th>Chris Kim</th><th>Sohyun Jeon</th><th>Inha Jung</th><th>Eunbi Kang</th><th>Yunji Lim</th><th>Kristine Park</th></tr></thead><tbody><tr><th class="sticky-col">직책</th><td class="wrap">Senior Manager, E-commerce Admin</td><td class="wrap">Ecommerce Planner</td><td class="wrap">Ecommerce Planner</td><td class="wrap">UI UX Designer</td><td class="wrap">Content Ops Specialist</td><td class="wrap">B2B E-Commerce Planning</td></tr><tr><th class="sticky-col">팀 내 위치</th><td class="wrap">기술 리더</td><td class="wrap">전략·기획 리더</td><td class="wrap">운영·개발 브릿지</td><td class="wrap">디자인 QA 리더</td><td class="wrap">콘텐츠·프로모션 매니저</td><td class="wrap">출시·운영 조율자</td></tr><tr><th class="sticky-col">핵심 과업 1</th><td class="wrap">Platform Dev &amp; Innovation (30%)</td><td class="wrap">Platform Strategy (20%)</td><td class="wrap">Platform Operation (20%)</td><td class="wrap">Design Production (30%)</td><td class="wrap">Content Design (20%)</td><td class="wrap">Product Launch (30%)</td></tr><tr><th class="sticky-col">핵심 과업 2</th><td class="wrap">New Business Launch (40%)</td><td class="wrap">Cross-functional PM (20%)</td><td class="wrap">Project Mgmt &amp; QA (20%)</td><td class="wrap">Design QA (20%)</td><td class="wrap">UX/UI Design (20%)</td><td class="wrap">Digital Communication (20%)</td></tr><tr><th class="sticky-col">핵심 과업 3</th><td class="wrap">Infrastructure Management (20%)</td><td class="wrap">Data &amp; Analytics (20%)</td><td class="wrap">Automation (20%)</td><td class="wrap">Design Guideline (20%)</td><td class="wrap">Design Automation (20%)</td><td class="wrap">Platform QA (20%)</td></tr><tr><th class="sticky-col">세부 업무 1</th><td class="wrap">Odoo16 커스텀 개발</td><td class="wrap">로드맵 수립</td><td class="wrap">플랫폼 운영 안정화</td><td class="wrap">UI/UX 직접 제작</td><td class="wrap">콘텐츠 및 배너 제작</td><td class="wrap">신규 제품 출시 관리</td></tr><tr><th class="sticky-col">세부 업무 2</th><td class="wrap">신규 브랜드 시스템 통합</td><td class="wrap">프로젝트 기획·실행</td><td class="wrap">개발 과제 정의</td><td class="wrap">벤더 결과물 검증</td><td class="wrap">프로모션 기획·운영</td><td class="wrap">B2B·B2C 메시징</td></tr><tr><th class="sticky-col">세부 업무 3</th><td class="wrap">AWS 인프라 모니터링</td><td class="wrap">GA4 데이터 분석</td><td class="wrap">자동화 설계</td><td class="wrap">가이드라인 설계</td><td class="wrap">운영 QA 및 CS</td><td class="wrap">플랫폼 QA 및 배포</td></tr><tr><th class="sticky-col">2026년 주요 이니셔티브</th><td class="wrap">①AI 개발 도입 확대 ②신규 제품 런칭 20+ ③플랫폼 안정성 강화</td><td class="wrap">①플랫폼 고도화 로드맵 ②데이터 기반 의사결정 강화 ③자동화 구조 설계</td><td class="wrap">①운영 안정성 확보 ②자동화 실행 ③세일즈 연계 강화</td><td class="wrap">①AI 디자인 도구 도입 ②자산화 확대 ③품질 기준 표준화</td><td class="wrap">①콘텐츠 자동화 확대 ②프로모션 효율화 ③마케팅 성과 분석</td><td class="wrap">①Go-To-Market 프로세스 최적화 ②메시징 고도화 ③CRM 연동 강화</td></tr><tr><th class="sticky-col">기술 스택</th><td class="wrap">Odoo16, Python, AWS, PostgreSQL</td><td class="wrap">GA4, GTM, Power BI, Python</td><td class="wrap">Odoo, Python, SharePoint</td><td class="wrap">Figma, HTML/CSS, AI Tool</td><td class="wrap">Figma, Excel, RPA Tool</td><td class="wrap">CMS, Smartsheet, Formstack</td></tr><tr><th class="sticky-col">협업 주요 상대</th><td class="wrap">IT, BPM 전체팀, 개발 벤더</td><td class="wrap">BO, BPM 전체팀, Marketing</td><td class="wrap">Chris Kim, Eunbi, Yunji, SSM</td><td class="wrap">BPM 전체, 외부 벤더</td><td class="wrap">BPM 전체, Marketing</td><td class="wrap">Product, IT, Admin, Sales</td></tr><tr><th class="sticky-col">2026 성공 지표</th><td class="wrap">신규 제품 안정적 런칭, 플랫폼 uptime 99%+</td><td class="wrap">플랫폼 매출 기여도, 전환율 개선율</td><td class="wrap">운영 효율성 증대, 자동화 업무 감소율</td><td class="wrap">디자인 QA 오류율, 완성도 지수</td><td class="wrap">콘텐츠 제작 시간 단축률, 캠페인 성과</td><td class="wrap">출시 지연율, 메시징 정확성</td></tr></tbody></table></div></div></section><section class="sds-section" id="detail-krs-kevin-hahyung"><h2><span class="n">8</span>KRS 전담 (Kevin &amp; Hahyung)</h2><div class="sds-block"><h3>KRS 전담 (Kevin &amp; Hahyung)</h3><div class="sds-caption">2명 · 17개 항목. 열이 인원, 행이 항목이다.</div><div class="sds-tablewrap"><table class="sds-table"><thead><tr><th class="sticky-col">구분</th><th>Kevin Nho</th><th>Hahyung Jung</th></tr></thead><tbody><tr><th class="sticky-col">직책</th><td class="wrap">Senior Manager, Business Project/Program Management</td><td class="wrap">Business Analyst</td></tr><tr><th class="sticky-col">소속 팀</th><td class="wrap">Business Platform Management (BPM) - KRS</td><td class="wrap">Business Platform Management (BPM) - KRS</td></tr><tr><th class="sticky-col">역할 유형</th><td class="wrap">Product Owner &amp; Strategy Leader</td><td class="wrap">Operating System Architect &amp; Data Integration Lead</td></tr><tr><th class="sticky-col">핵심 책임</th><td class="wrap">KRS 플랫폼 전체 생명주기 관리 및 로드맵</td><td class="wrap">KRS 운영 시스템 통합 및 데이터 무결성</td></tr><tr><th class="sticky-col">주요 과업 1 (20%)</th><td class="wrap">비즈니스·기술 요구사항 정의</td><td class="wrap">운영 시스템 설계 및 통합</td></tr><tr><th class="sticky-col">주요 과업 2 (20%)</th><td class="wrap">제품 로드맵 개발·라이프사이클 관리</td><td class="wrap">데이터 운영 및 SAP/MM 관리</td></tr><tr><th class="sticky-col">주요 과업 3 (20%)</th><td class="wrap">제품 리서치 및 혁신 기획</td><td class="wrap">POS 소프트웨어 및 플랫폼 운영</td></tr><tr><th class="sticky-col">세부 업무 1</th><td class="wrap">KRS Dev &amp; UAT 계획 및 관리</td><td class="wrap">POS↔KRS Admin↔Snowflake↔SAP 통합</td></tr><tr><th class="sticky-col">세부 업무 2</th><td class="wrap">H/W 선정·조달·테스트·배포 전체 프로세스</td><td class="wrap">Master Data 무결성 관리</td></tr><tr><th class="sticky-col">세부 업무 3</th><td class="wrap">결제 시스템 통합 및 운영 워크플로우 설계</td><td class="wrap">POS 운영 안정성 및 표준화</td></tr><tr><th class="sticky-col">세부 업무 4</th><td class="wrap">2차 결제 업체 선정 및 통합</td><td class="wrap">데이터 품질 모니터링 및 이슈 해결</td></tr><tr><th class="sticky-col">세부 업무 5</th><td class="wrap">운영 준비 및 Delivery 계획</td><td class="wrap">비즈니스 모델 및 P&amp;L 운영</td></tr><tr><th class="sticky-col">세부 업무 6</th><td class="wrap">플랫폼 고도화 및 신기능 로드맵</td><td class="wrap">고객 운영 및 성과 분석</td></tr><tr><th class="sticky-col">협력 상대</th><td class="wrap">SSM(Harry Kwon), IT, BPM 전체</td><td class="wrap">Kevin Nho, BO, 영업팀, IT, SAP 팀</td></tr><tr><th class="sticky-col">2026 목표</th><td class="wrap">Phase 1.5/2 성공적 완성 | 20개 프로젝트 런칭 | 플랫폼 고도화</td><td class="wrap">시스템 안정성 확보 | Master Data 정합성 | 운영 효율성 극대화</td></tr><tr><th class="sticky-col">전략적 위치</th><td class="wrap">KRS 플랫폼의 '눈'과 '방향', Business-Technology Strategist</td><td class="wrap">KRS 플랫폼의 '신경계', 운영 시스템 통합 아키텍트</td></tr><tr><th class="sticky-col">성공 지표</th><td class="wrap">프로젝트 온타임 완료율, 플랫폼 안정성 (uptime)</td><td class="wrap">Master Data 정합성율, 데이터 품질 지수</td></tr></tbody></table></div></div></section><section class="sds-section" id="detail-strategic-solutions-ssm"><h2><span class="n">9</span>Strategic Solutions (SSM) 상세</h2><div class="sds-block"><h3>Strategic Solutions (SSM) 상세</h3><div class="sds-caption">4명 · 15개 항목. 열이 인원, 행이 항목이다.</div><div class="sds-tablewrap"><table class="sds-table"><thead><tr><th class="sticky-col">구분</th><th>Harry Kwon</th><th>DK Kang</th><th>Hye Jin Ryoo</th><th>Siun Park</th></tr></thead><tbody><tr><th class="sticky-col">직책</th><td class="wrap">Director, Project Management</td><td class="wrap">Manager, Project and Operation</td><td class="wrap">Specialist, Project Management</td><td class="wrap">Specialist, Project Management</td></tr><tr><th class="sticky-col">팀 내 위치</th><td class="wrap">SSM 리더, 통합 PM</td><td class="wrap">CRM PM &amp; 데이터 분석 리더</td><td class="wrap">요구사항 정의 전문가</td><td class="wrap">프로젝트 실행가 &amp; 운영 전담</td></tr><tr><th class="sticky-col">핵심 역할</th><td class="wrap">Strategic Project &amp; Program Leadership</td><td class="wrap">CRM Project &amp; Data Analytics Manager</td><td class="wrap">Business Requirements Analyst &amp; Solution Quality Lead</td><td class="wrap">Project Execution &amp; Solution Operations Manager</td></tr><tr><th class="sticky-col">주요 책임 1 (20%)</th><td class="wrap">프로젝트 기획·실행·통제</td><td class="wrap">프로젝트 기획 및 범위 관리</td><td class="wrap">이해관계자 요구사항 분석</td><td class="wrap">프로젝트 기획 및 실행</td></tr><tr><th class="sticky-col">주요 책임 2 (20%)</th><td class="wrap">이해관계자 커뮤니케이션·리스크 관리</td><td class="wrap">데이터 분석 및 성과 측정 (40%)</td><td class="wrap">시장 리서치 및 경쟁사 분석</td><td class="wrap">범위 정의 및 전달물 관리</td></tr><tr><th class="sticky-col">주요 책임 3 (10%)</th><td class="wrap">솔루션 운영 관리</td><td class="wrap">Cross-functional 협업 (10%)</td><td class="wrap">개발 조율 및 테스트 (20%)</td><td class="wrap">진행 추적 및 이해관계자 협업 (10%)</td></tr><tr><th class="sticky-col">세부 업무 1</th><td class="wrap">KRS Phase 1 시스템·비즈니스 런칭</td><td class="wrap">CRM 프로젝트 기획·범위·리스크 관리</td><td class="wrap">KRS Phase 1/2 기능 정의</td><td class="wrap">KRS Phase 1 프로젝트 지원</td></tr><tr><th class="sticky-col">세부 업무 2</th><td class="wrap">KRS Phase 2 프로젝트 기획·관리</td><td class="wrap">Power BI/Snowflake 데이터 분석</td><td class="wrap">KRS 운영 안정화 기능 정의</td><td class="wrap">Sales Platform Revamp 추진</td></tr><tr><th class="sticky-col">세부 업무 3</th><td class="wrap">CRM-Service 구현 총괄</td><td class="wrap">Nail Division 예측·재고 관리</td><td class="wrap">CRM-Service 구현 기능 명세</td><td class="wrap">Sales Platform &amp; Mileage Expense 운영</td></tr><tr><th class="sticky-col">세부 업무 4</th><td class="wrap">Sales Platform Revamp</td><td class="wrap">Dashboard 관리 및 유지보수</td><td class="wrap">솔루션 운영 (1차 백업)</td><td class="wrap">Mileage Expense 운영</td></tr><tr><th class="sticky-col">세부 업무 5</th><td class="wrap">솔루션 모니터링 (Sales Platform)</td><td class="wrap"></td><td class="wrap">솔루션 운영 (1차 백업)</td><td class="wrap"></td></tr><tr><th class="sticky-col">기술 도구</th><td class="wrap">MS Project, PowerPoint, SharePoint</td><td class="wrap">Power BI, Snowflake, Excel, SQL</td><td class="wrap">Confluence, Jira, Excel</td><td class="wrap">Jira, SharePoint, Smartsheet</td></tr><tr><th class="sticky-col">협업 주요 상대</th><td class="wrap">전 팀 (Director급 협업)</td><td class="wrap">BO, BPM, Finance, IT</td><td class="wrap">Kevin Nho(KRS), IT, 비즈니스팀</td><td class="wrap">BPM, Sales, BO</td></tr><tr><th class="sticky-col">2026년 이니셔티브</th><td class="wrap">KRS Phase 1.5/2 성공 | CRM 로드맵 추진 | Sales Platform 개편</td><td class="wrap">CRM 데이터 정합성 확보 | 분석 고도화 | 성과 측정 체계 구축</td><td class="wrap">KRS 안정화 | CRM 요구사항 명확화 | 품질 검증 강화</td><td class="wrap">프로젝트 온타임 완료 | 운영 효율성 확보</td></tr><tr><th class="sticky-col">성공 지표</th><td class="wrap">프로젝트 완료율, 만족도, 리스크 관리</td><td class="wrap">분석 정확도, 데이터 품질, 성과 달성</td><td class="wrap">요구사항 명확도, 결함 발견율</td><td class="wrap">프로젝트 지연율, 운영 만족도</td></tr></tbody></table></div></div></section><section class="sds-section" id="coverage"><h2><span class="n">10</span>롤 커버리지<span class="sds-derived-tag">derived</span></h2><div class="sds-block"><h3>과업 슬롯 커버리지<span class="sds-derived-tag">derived</span></h3><div class="sds-caption">숫자는 해당 슬롯을 채운 인원 수다. 0은 담당 공백, 복수 인원 팀에서 1은 단일 인원 의존이다.</div><div style="overflow:auto"><table class="sds-heat"><thead><tr><th></th><th>핵심 과업 1</th><th>핵심 과업 2</th><th>핵심 과업 3</th></tr></thead><tbody><tr><th>Business Operations (BO)</th><td data-h="2">3</td><td data-h="2">3</td><td data-h="2">3</td></tr><tr><th>Business Platform Management (BPM)</th><td data-h="4">6</td><td data-h="4">6</td><td data-h="4">6</td></tr><tr><th>BPM - K Retail Solutions (KRS)</th><td data-h="2">2</td><td data-h="2">2</td><td data-h="2">2</td></tr><tr><th>Strategic Solution Management (SSM)</th><td data-h="3">4</td><td data-h="3">4</td><td data-h="3">4</td></tr></tbody></table></div></div></section><section class="sds-section" id="risks"><h2><span class="n">11</span>리스크 · 전제</h2><div class="sds-block"><h3>리스크 · 전제</h3><div class="sds-tablewrap"><table class="sds-table"><thead><tr><th>리스크</th><th>영향</th><th>완화</th><th>오너</th><th>상태</th></tr></thead><tbody><tr><td class="wrap">20개 신규 프로젝트 동시 추진 시 리소스 부족</td><td class="wrap">원본 워크북에 영향도가 기재되지 않았다.</td><td class="wrap">TODO 완화 방안을 작성하라.</td><td>Harry Kwon + 리더들</td><td><span class="sds-badge" data-s="warn">미완</span></td></tr><tr><td class="wrap">자동화 구현 난도 높음</td><td class="wrap">원본 워크북에 영향도가 기재되지 않았다.</td><td class="wrap">TODO 완화 방안을 작성하라.</td><td>Harry Kwon + 리더들</td><td><span class="sds-badge" data-s="warn">미완</span></td></tr><tr><td class="wrap">팀 역량 개발 시간 필요</td><td class="wrap">원본 워크북에 영향도가 기재되지 않았다.</td><td class="wrap">TODO 완화 방안을 작성하라.</td><td>Harry Kwon + 리더들</td><td><span class="sds-badge" data-s="warn">미완</span></td></tr></tbody></table></div></div></section><section class="sds-section" id="sources"><h2><span class="n">12</span>부록 — 원천 데이터</h2><div class="sds-block"><div class="sds-caption">이 문서의 모든 표는 아래 워크북에서 파생되었다.</div><div class="sds-tablewrap"><table class="sds-table"><thead><tr><th>원천</th><th>경로</th><th>시트</th><th class="num">행수</th><th>기준일</th></tr></thead><tbody><tr><td>2026 SOM Team R&amp;R v 1.0</td><td class="wrap"><code>&lt;팀 공유 폴더&gt;/2026 SOM Team R&amp;R v1.0.xlsx</code></td><td>SOM Team 전체 현황, 2026 전략 핵심 지점, Business Operations (BO) 상세, Business Platform (BPM) 상세, KRS 전담 (Kevin &amp; Hahyung), Strategic Solutions (SSM) 상세</td><td class="num">15</td><td>2026-09-09</td></tr></tbody></table></div></div></section>
+<footer class="sds-foot"><span>생성 <code>somdoc 0.1.0</code></span><span>기준일 <code>2026-09-09</code></span><span>IR 해시 <code>4c0fac5bd209</code></span><span>doc_type <code>rnr</code></span></footer>
+</div>
+<script>
+/* SDS v1 runtime. No dependencies, no network, degrades to a static document
+ * if it never runs.
+ *
+ * Filtering reads ONLY the per-row `data-f` JSON array that the emitter wrote.
+ * It never scans cell text. That is deliberate: scanning text makes a search
+ * for "1100" match a PO number, an item description, and a date, which is the
+ * over-matching bug this design already fixed once.
+ */
+(function () {
+  "use strict";
+
+  function rowsOf(table) {
+    return Array.prototype.slice.call(table.tBodies[0] ? table.tBodies[0].rows : []);
+  }
+
+  function filterValues(row) {
+    var raw = row.getAttribute("data-f");
+    if (!raw) return [];
+    try { return JSON.parse(raw); } catch (e) { return []; }
+  }
+
+  function wireTable(wrap) {
+    var table = wrap.querySelector("table.sds-table");
+    if (!table || !table.tBodies.length) return;
+
+    var id = wrap.getAttribute("data-table-id") || "";
+    var bar = document.querySelector('.sds-tablebar[data-for="' + id + '"]');
+    var search = bar && bar.querySelector(".sds-search");
+    var toggle = bar && bar.querySelector('[data-act="cols"]');
+    var count = bar && bar.querySelector(".sds-rowcount");
+    var rows = rowsOf(table);
+    var total = rows.length;
+
+    function apply() {
+      var q = (search && search.value || "").trim().toLowerCase();
+      var shown = 0;
+      for (var i = 0; i < rows.length; i++) {
+        var hit = true;
+        if (q) {
+          hit = false;
+          var vals = filterValues(rows[i]);
+          for (var j = 0; j < vals.length; j++) {
+            if (String(vals[j]).toLowerCase().indexOf(q) !== -1) { hit = true; break; }
+          }
+        }
+        rows[i].hidden = !hit;
+        if (hit) shown++;
+      }
+      if (count) {
+        count.textContent = shown === total
+          ? total.toLocaleString() + " rows"
+          : shown.toLocaleString() + " / " + total.toLocaleString() + " rows";
+      }
+    }
+
+    if (search) {
+      search.addEventListener("input", apply);
+      search.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") { search.value = ""; apply(); }
+      });
+    }
+
+    if (toggle) {
+      toggle.addEventListener("click", function () {
+        var all = wrap.getAttribute("data-cols") === "all";
+        wrap.setAttribute("data-cols", all ? "core" : "all");
+        toggle.setAttribute("aria-pressed", all ? "false" : "true");
+        toggle.textContent = all ? toggle.getAttribute("data-label-core")
+                                 : toggle.getAttribute("data-label-all");
+      });
+    }
+
+    apply();
+  }
+
+  function wireLang() {
+    var btns = document.querySelectorAll('[data-act="lang"]');
+    if (!btns.length) return;
+    Array.prototype.forEach.call(btns, function (b) {
+      b.addEventListener("click", function () {
+        var next = b.getAttribute("data-lang");
+        document.documentElement.setAttribute("lang", next);
+        Array.prototype.forEach.call(btns, function (x) {
+          x.setAttribute("aria-pressed", String(x.getAttribute("data-lang") === next));
+        });
+        // Per-viewer convenience only. Never load-bearing.
+        try { localStorage.setItem("sds.lang", next); } catch (e) { /* private mode */ }
+      });
+    });
+    try {
+      var saved = localStorage.getItem("sds.lang");
+      if (saved) {
+        var target = document.querySelector('[data-act="lang"][data-lang="' + saved + '"]');
+        if (target) target.click();
+      }
+    } catch (e) { /* private mode, blocked site data, thumbnailer */ }
+  }
+
+  function init() {
+    Array.prototype.forEach.call(document.querySelectorAll(".sds-tablewrap"), wireTable);
+    wireLang();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+
+</script>
+</body>
+</html>

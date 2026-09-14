@@ -1,0 +1,17 @@
+# som engine dependencies. Versions are pinned because the golden test
+# byte-compares rendered HTML: an emitter or writer version change can shift
+# output and would otherwise fail for a reason nobody can see.
+#
+#   pip install -r engine/requirements.txt
+#
+# Verify after any change:
+#   python engine/tests/test_ir.py
+pandas==2.1.4
+openpyxl==3.1.5
+sqlglot==30.18.0
+pyarrow==21.0.0
+python-docx==1.1.2
+python-pptx==1.0.2
+snowflake-connector-python==3.18.0
+keyring==25.6.0
+Jinja2==3.1.4

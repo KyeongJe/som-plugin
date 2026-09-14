@@ -1,0 +1,31 @@
+{
+  "_README": [
+    "이 저장소는 공개입니다. 실제 테이블 이름은 여기 적지 말고,",
+    "쿼리를 돌리는 컴퓨터의 <project>/.som/registry.json 에 두세요.",
+    "(.som/ 은 .gitignore 에 있습니다.)",
+    "",
+    "large_tables 에 등록된 객체는 날짜 조건 없이 조회하면 거부됩니다.",
+    "비워두면 그 가드만 동작하지 않고, /som:doctor 와 somsql plan 이 그렇다고 알려줍니다."
+  ],
+
+  "warehouse": "<WAREHOUSE>",
+
+  "large_tables": {
+    "SALES_FACT": ["ORDER_DATE", "SHIP_DATE"],
+    "ORDER_LINE_HISTORY": ["CREATED_ON", "POSTING_DATE"]
+  },
+
+  "small_tables": [
+    "DIM_CUSTOMER",
+    "DIM_PRODUCT"
+  ],
+
+  "vocabulary": {
+    "SALESORG": {
+      "1000": "<브랜드 또는 법인 이름>"
+    },
+    "ORDER_TYPE": {
+      "WEB": "<주문 경로 설명>"
+    }
+  }
+}

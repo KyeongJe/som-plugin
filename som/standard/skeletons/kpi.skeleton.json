@@ -1,0 +1,147 @@
+{
+  "skeleton_version": 1,
+  "doc_type": "kpi",
+  "theme": "console",
+  "title": "KPI 정의 대장",
+  "purpose": "지표를 하나의 정의로 고정하고, 각 지표의 산식과 오너를 명시한다.",
+  "derived_from": "R&R 스켈레톤과 같은 규약. 차이는 §4 정의 대장이 문서의 중심이라는 것.",
+  "authoring_rules": [
+    "content-required 섹션은 named source 없이 채우지 않는다. 이것이 팀 문서의 anti-hallucination 게이트다.",
+    "derived 섹션은 계산 결과다. 손으로 쓰면 원천과 어긋난다.",
+    "정의 문장과 산식은 서로 다른 칸이다. 한 칸에 합치지 마라 — 문장은 사람이 합의하는 것이고 산식은 기계가 실행하는 것이다.",
+    "산식 없는 지표는 지표가 아니라 희망이다. 산식을 모르면 비워두지 말고 '미확정' 으로 적고 누가 정할지 쓴다.",
+    "원천은 테이블·컬럼까지 적는다. '영업 데이터' 는 원천이 아니다.",
+    "목표치를 발명하지 않는다. 사용자가 말하지 않았으면 베이스라인만 적고 목표는 결정 요청으로 올린다."
+  ],
+  "sections": [
+    {
+      "id": "control",
+      "title": "표지 · 문서 통제",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["docmeta"],
+      "note": "제목 · 대상 조직 · 기준일 · 버전 · 작성 · 승인 · 다음 리뷰일."
+    },
+    {
+      "id": "decision",
+      "title": "결정 요청",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["decision_request"],
+      "note": "3건 이내, 문서 앞쪽. 목표치 승인이 여기 오는 일이 많다. 지어내지 마라."
+    },
+    {
+      "id": "overview",
+      "title": "한눈에",
+      "tag": "derived",
+      "blocks": ["kpi_tiles", "callout"],
+      "note": "핵심 지표 4~6개의 현재값. §4 대장에서 파생되며 손으로 쓰지 않는다."
+    },
+    {
+      "id": "ledger",
+      "title": "KPI 정의 대장",
+      "tag": "content-required",
+      "source": "사용자 입력 + 데이터 원천",
+      "blocks": ["table"],
+      "note": "이 문서의 중심. 컬럼: ID | 관점(F/C/P/L) | KPI명 | 정의 문장 | 산식 | 단위 | 방향 | 원천(테이블·컬럼) | 주기 | 오너 | 베이스라인 | 목표 | 임계 | 상태. row_grain 은 '행 1개 = KPI 1개'.",
+      "columns_required": ["id", "perspective", "name", "definition", "formula",
+                           "unit", "direction", "source", "cadence", "owner"]
+    },
+    {
+      "id": "perspective",
+      "title": "관점별 균형",
+      "tag": "derived",
+      "blocks": ["chart", "bullets"],
+      "note": "관점(F/C/P/L)별 지표 수. 한쪽으로 쏠렸으면 그것이 takeaway 다."
+    },
+    {
+      "id": "owners",
+      "title": "오너십",
+      "tag": "content-required",
+      "source": "roster",
+      "blocks": ["table"],
+      "note": "오너 1명당 몇 개의 지표를 지는가. 이름은 roster 원천에 있는 것만."
+    },
+    {
+      "id": "conflicts",
+      "title": "지표 간 상충",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["matrix", "bullets"],
+      "note": "한쪽을 올리면 다른 쪽이 내려가는 쌍. 상충이 없다고 적기 전에 정말 없는지 확인한다 — 대개는 아직 안 찾은 것이다."
+    },
+    {
+      "id": "lineage",
+      "title": "데이터 계보",
+      "tag": "content-required",
+      "source": "데이터 원천",
+      "blocks": ["diagram", "table"],
+      "note": "원천 테이블에서 지표까지의 경로. 중간 변환이 있으면 그것도."
+    },
+    {
+      "id": "cadence",
+      "title": "측정 주기와 책임",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["table"],
+      "note": "지표 | 주기 | 누가 갱신 | 어디에 게시 | 미갱신 시 영향."
+    },
+    {
+      "id": "formula_check",
+      "title": "산식 검증",
+      "tag": "derived",
+      "blocks": ["table", "callout"],
+      "note": "산식이 있는 지표 / 없는 지표, 원천이 명시된 지표 / 아닌 지표. 비어 있는 칸을 세는 절이다."
+    },
+    {
+      "id": "risks",
+      "title": "리스크 · 전제",
+      "tag": "optional",
+      "blocks": ["bullets"],
+      "note": "지표가 왜곡될 수 있는 조건. 게이밍 가능성 포함."
+    },
+    {
+      "id": "changelog",
+      "title": "변경 이력",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["changelog"],
+      "note": "정의가 바뀌면 이력이 남아야 한다. 정의가 조용히 바뀐 지표는 추세가 거짓이 된다."
+    },
+    {
+      "id": "appendix",
+      "title": "부록 — 원천 데이터",
+      "tag": "content-required",
+      "source": "데이터 원천",
+      "blocks": ["appendix_source"],
+      "note": "파일 · 시트 · 행수 · 기준일 · 계산 규칙."
+    }
+  ],
+  "attest": [
+    {
+      "check": "formula_present",
+      "rule": "대장의 모든 지표에 산식이 있다. 없으면 '미확정' 으로 명시되어 있고 누가 정할지 적혀 있다",
+      "threshold": 0
+    },
+    {
+      "check": "definition_distinct_from_formula",
+      "rule": "정의 문장과 산식이 서로 다른 칸에 있고 둘 다 비어 있지 않다",
+      "threshold": 0
+    },
+    {
+      "check": "source_named",
+      "rule": "모든 지표의 원천이 테이블·컬럼 수준으로 적혀 있다",
+      "threshold": 0
+    },
+    {
+      "check": "owner_in_roster",
+      "rule": "모든 오너가 roster 원천에 존재한다",
+      "threshold": 0
+    },
+    {
+      "check": "decision_position",
+      "rule": "decision_request 가 앞 3개 절 안에 있고 3건 이내다",
+      "threshold": 3
+    }
+  ]
+}

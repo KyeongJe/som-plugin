@@ -1,0 +1,8 @@
+[
+  {
+    "name": "orca-inbox",
+    "description": "Orca orchestration events for the active som run (worker_done / escalation / question / merge_ready). One stdout line per actionable message; heartbeats and status are never emitted.",
+    "command": "node \"${CLAUDE_PLUGIN_ROOT}/monitors/inbox-watch.mjs\" --project \"${CLAUDE_PROJECT_DIR}\" --data \"${CLAUDE_PLUGIN_DATA}\"",
+    "when": "on-skill-invoke:conduct"
+  }
+]

@@ -1,0 +1,120 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install pinned dependencies
+        run: pip install -r som/engine/requirements.txt
+
+      # Manifest rules first: a manifest error makes the plugin fail to load,
+      # which is a symptom with no visible cause.
+      # Manifest rules also assert that every path a skill tells you to open
+      # exists, and that the generated schema matches ir.py.
+      - name: Manifest rules
+        working-directory: som
+        env:
+          PYTHONUTF8: "1"
+        run: python engine/tests/test_manifest.py
+
+      - name: IR rules and golden render
+        working-directory: som
+        env:
+          PYTHONUTF8: "1"
+        run: python engine/tests/test_ir.py
+
+      # The kpi and charter skeletons were advertised in four places and had
+      # never been turned into a document. This builds all three and re-renders
+      # from the committed IR copy to check the byte-identical claim.
+      - name: Skeletons build, and validate() never crashes
+        working-directory: som
+        env:
+          PYTHONUTF8: "1"
+        run: python engine/tests/test_skeletons.py
+
+      # Diagram text that overflows its canvas or collides with a neighbour
+      # shipped in the README three times. The SVGs are generated, so nothing
+      # noticed until someone looked at the page.
+      - name: Diagram text fits and does not collide
+        working-directory: som
+        env:
+          PYTHONUTF8: "1"
+        run: python engine/tests/test_diagrams.py
+
+      # The first thirty minutes for someone who has only Claude Code:
+      # doctor, pick a recipe, see the questions, settle the interview, run,
+      # render. Nothing here needs network, credentials, Orca, or a worker.
+      - name: A bare machine can walk the documented path
+        working-directory: som
+        env:
+          PYTHONUTF8: "1"
+        run: python engine/tests/test_bare_walkthrough.py
+
+      - name: humanize invariants
+        working-directory: som
+        env:
+          PYTHONUTF8: "1"
+        run: python engine/tests/test_humanize_io.py
+
+      - name: Snowflake classifier and cost guard
+        working-directory: som
+        env:
+          PYTHONUTF8: "1"
+        run: python engine/tests/test_somsql.py
+
+      # What a teammate gets with nothing installed but Claude: no pandas,
+      # no openpyxl, no sqlglot, no Orca. The HTML path has to survive that,
+      # because that is the floor the plugin promises.
+      - name: Works with nothing but the standard library
+        working-directory: som
+        env:
+          PYTHONUTF8: "1"
+        run: python engine/tests/test_bare_install.py
+
+      # Everything on the Node side: the Snowflake bypass guards (which matter
+      # in both directions -- deny outside the entrypoint, never block
+      # unrelated work), the ambiguity gate, the pattern library, the autonomy
+      # ledger. The live-worker e2e is not here; it needs Orca.
+      - name: Node engine
+        working-directory: som
+        run: node --test test/*.test.mjs
+
+      # The golden test byte-compares HTML, so it only means anything if line
+      # endings are normalised. .gitattributes pins `* text eol=lf`; this
+      # proves the checkout honoured it.
+      - name: Golden render is byte-identical
+        working-directory: som
+        env:
+          PYTHONUTF8: "1"
+          PYTHONPATH: engine
+        run: |
+          python -m somdoc golden standard/examples/rnr.example.somdoc.json \
+            --against standard/examples/golden/rnr.html --as-of 2026-09-09
+
+      - name: Documentation rebuilds
+        working-directory: som
+        env:
+          PYTHONUTF8: "1"
+        run: python docs/build_docs.py --out /tmp/somdocs
+
+      # Every published test count, against what the suites actually report.
+      # The README total, its per-suite breakdown, and the generated graph are
+      # three separate pipelines, and all three have drifted.
+      - name: Published counts are measured, not typed
+        working-directory: som
+        env:
+          PYTHONUTF8: "1"
+        run: python docs/check_counts.py

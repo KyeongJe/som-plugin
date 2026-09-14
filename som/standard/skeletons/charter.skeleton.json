@@ -1,0 +1,146 @@
+{
+  "skeleton_version": 1,
+  "doc_type": "charter",
+  "theme": "paper",
+  "title": "팀 차터",
+  "purpose": "팀이 무엇을 하고 무엇을 하지 않는지, 무엇을 어떻게 요청받는지 정한다.",
+  "derived_from": "R&R 스켈레톤과 같은 규약. 차이는 경계(§4 Out)와 서비스 카탈로그가 중심이라는 것.",
+  "authoring_rules": [
+    "content-required 섹션은 named source 없이 채우지 않는다. 이것이 팀 문서의 anti-hallucination 게이트다.",
+    "§4 의 Out 을 반드시 채운다. 하지 않는 일을 적지 않은 경계 문서는 경계를 정하지 않은 것이다.",
+    "서비스마다 리드타임을 적는다. 숫자가 없으면 '미확정' 으로 적고 언제 정할지 쓴다 — 비워두면 요청자가 자기 마음대로 기대한다.",
+    "DACI 는 역할당 사람이 정확히 누구인지 적는다. '팀' 은 책임자가 아니다.",
+    "인원 이름은 roster 원천에 있는 것만 쓴다."
+  ],
+  "sections": [
+    {
+      "id": "control",
+      "title": "표지 · 문서 통제",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["docmeta"],
+      "note": "제목 · 대상 조직 · 기준일 · 버전 · 작성 · 승인 · 다음 리뷰일."
+    },
+    {
+      "id": "decision",
+      "title": "결정 요청",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["decision_request"],
+      "note": "3건 이내, 문서 앞쪽. 범위 승인이나 인력 요청이 여기 온다. 지어내지 마라."
+    },
+    {
+      "id": "mission",
+      "title": "존재 이유",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["callout", "bullets"],
+      "note": "이 팀이 없으면 무엇이 안 되는가. 한 문단. 미사여구 없이."
+    },
+    {
+      "id": "scope",
+      "title": "범위 — 하는 일과 하지 않는 일",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["matrix", "bullets"],
+      "note": "In 과 Out 을 같은 무게로. Out 이 비어 있으면 이 문서는 아직 완성이 아니다 — 경계 문서의 핵심은 거절할 수 있게 만드는 것이다."
+    },
+    {
+      "id": "catalog",
+      "title": "서비스 카탈로그",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["table"],
+      "note": "서비스 | 산출물 | 수요자 | 요청 경로 | 리드타임 | 전제조건. row_grain 은 '행 1개 = 서비스 1개'."
+    },
+    {
+      "id": "interfaces",
+      "title": "협업 인터페이스",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["table"],
+      "note": "산출물 | 수신팀 | 주기 | SLA | 미준수 시 영향. 상대팀이 읽고 동의할 수 있는 문장으로."
+    },
+    {
+      "id": "decision_rights",
+      "title": "의사결정 권한 (DACI)",
+      "tag": "content-required",
+      "source": "roster",
+      "blocks": ["matrix"],
+      "note": "결정 영역별 Driver / Approver / Contributor / Informed. 이름은 roster 에 있는 것만."
+    },
+    {
+      "id": "team",
+      "title": "구성과 역할",
+      "tag": "content-required",
+      "source": "roster",
+      "blocks": ["table", "diagram"],
+      "note": "인원과 역할. 상세 R&R 은 별도 문서이고 여기서는 한 줄씩."
+    },
+    {
+      "id": "maturity",
+      "title": "성숙도 단계",
+      "tag": "optional",
+      "blocks": ["table", "chart"],
+      "note": "지금 단계와 다음 단계의 조건. 단계 이름만 있고 조건이 없으면 쓰지 않는 게 낫다."
+    },
+    {
+      "id": "capacity",
+      "title": "역량 · 인력 계획",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["table", "bullets"],
+      "note": "역량 | 현재 | 필요 | 갭 | 확보 방안. 갭을 0 으로 적고 싶은 유혹을 견딘다."
+    },
+    {
+      "id": "risks",
+      "title": "리스크 · 전제",
+      "tag": "optional",
+      "blocks": ["bullets"],
+      "note": "이 차터가 성립하기 위해 참이어야 하는 것들."
+    },
+    {
+      "id": "changelog",
+      "title": "변경 이력",
+      "tag": "content-required",
+      "source": "사용자 입력",
+      "blocks": ["changelog"],
+      "note": "범위가 바뀌면 이력이 남아야 한다."
+    },
+    {
+      "id": "appendix",
+      "title": "부록 — 원천",
+      "tag": "content-required",
+      "source": "데이터 원천",
+      "blocks": ["appendix_source"],
+      "note": "roster 파일 · 시트 · 행수 · 기준일."
+    }
+  ],
+  "attest": [
+    {
+      "check": "scope_out_present",
+      "rule": "§4 의 Out 이 비어 있지 않다. 하지 않는 일을 적지 않은 경계 문서는 경계가 없다",
+      "threshold": 0
+    },
+    {
+      "check": "service_leadtime",
+      "rule": "카탈로그의 모든 서비스에 리드타임이 있다. 없으면 '미확정' 으로 명시되어 있다",
+      "threshold": 0
+    },
+    {
+      "check": "daci_named",
+      "rule": "모든 결정 영역에 Driver 와 Approver 가 사람 이름으로 있다 (팀 이름은 안 된다)",
+      "threshold": 0
+    },
+    {
+      "check": "roster_orphans",
+      "rule": "문서에 등장하는 모든 인원이 roster 원천에 존재한다",
+      "threshold": 0
+    },
+    {
+      "check": "decision_position",
+      "rule": "decision_request 가 앞 3개 절 안에 있고 3건 이내다",
+      "threshold": 3
+    }
+  ]
+}

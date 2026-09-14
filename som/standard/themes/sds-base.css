@@ -1,0 +1,302 @@
+/* SOM Doc Standard (SDS) v1 - base stylesheet
+ *
+ * Table behaviour here is inherited from a report template that already
+ * survived real use (SOM/2026/08. BO Training/01. ZF_ZG_HoldOrder/app/
+ * report_template.py). The parts that look arbitrary are not:
+ *
+ *   - zebra striping is OFF, hover tint is ON. Stripes fight the badge tints.
+ *   - filtering reads a per-row `data-f` JSON array and nothing else, so a
+ *     search for "1100" cannot match a PO number or a description. That bug
+ *     was fixed once already; the source file says not to undo it.
+ *   - a table wider than 14 columns opens on a core-column view with a toggle,
+ *     because 22 columns cannot be read across on a laptop.
+ *   - every table prints its row grain above itself. Misreading the unit of a
+ *     row is the single most common way an exec document gets misused.
+ */
+
+/* ---------------------------------------------------------------- reset */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--sds-bg);
+  color: var(--sds-ink);
+  font-family: var(--sds-font-sans);
+  font-size: var(--sds-fs-body);
+  line-height: var(--sds-lh-body);
+  letter-spacing: var(--sds-tracking);
+  font-variant-numeric: tabular-nums;
+  -moz-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+}
+
+h1, h2, h3, h4 { margin: 0; line-height: var(--sds-lh-head); font-weight: var(--sds-fw-bold); }
+p  { margin: 0 0 var(--sds-sp-3); max-width: var(--sds-prose-max); }
+ul, ol { margin: 0; padding-left: 1.15em; }
+a  { color: var(--sds-accent); text-underline-offset: 2px; }
+code, .sds-mono { font-family: var(--sds-font-mono); font-size: .94em; }
+img, svg { max-width: 100%; }
+:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: 2px; }
+
+/* --------------------------------------------------- dual-language body */
+/* Korean team, English-reading executives. One file serves both.          */
+html[lang="ko"] .sds-en { display: none; }
+html[lang="en"] .sds-ko { display: none; }
+
+/* ------------------------------------------------------------ page frame */
+.sds-page {
+  max-width: var(--sds-page-max);
+  margin: 0 auto;
+  padding: var(--sds-sp-7) var(--sds-sp-5) var(--sds-sp-9);
+}
+
+.sds-doctitle { font-size: var(--sds-fs-display); letter-spacing: var(--sds-tracking-tight); }
+.sds-subtitle { color: var(--sds-ink-2); font-size: var(--sds-fs-h3); margin-top: var(--sds-sp-2); }
+
+/* document control strip: version, as-of, author, approver, next review */
+.sds-control {
+  display: flex; flex-wrap: wrap; gap: var(--sds-sp-1) var(--sds-sp-5);
+  margin-top: var(--sds-sp-5); padding-top: var(--sds-sp-3);
+  border-top: 1px solid var(--sds-rule);
+  font-size: var(--sds-fs-small); color: var(--sds-ink-2);
+}
+.sds-control dt { font-weight: var(--sds-fw-medium); color: var(--sds-ink-3); }
+.sds-control dd { margin: 0; }
+.sds-control > div { display: flex; gap: var(--sds-sp-2); align-items: baseline; }
+
+/* ---------------------------------------------------------------- nav/toc */
+.sds-toc {
+  margin: var(--sds-sp-6) 0 0; padding: var(--sds-sp-4) var(--sds-sp-5);
+  background: var(--sds-surface); border: 1px solid var(--sds-rule);
+  border-radius: var(--sds-r-2);
+}
+.sds-toc ol { list-style: none; padding: 0; columns: 2; column-gap: var(--sds-sp-7); }
+.sds-toc li { margin-bottom: var(--sds-sp-1); font-size: var(--sds-fs-small); break-inside: avoid; }
+.sds-toc a { color: var(--sds-ink-2); text-decoration: none; }
+.sds-toc a:hover { color: var(--sds-accent); text-decoration: underline; }
+.sds-toc .n { display: inline-block; min-width: 1.7em; color: var(--sds-ink-3); font-variant-numeric: tabular-nums; }
+
+/* --------------------------------------------------------------- section */
+.sds-section { margin-top: var(--sds-sp-8); scroll-margin-top: var(--sds-sp-5); }
+.sds-section > h2 {
+  font-size: var(--sds-fs-h1); letter-spacing: var(--sds-tracking-tight);
+  padding-bottom: var(--sds-sp-2); border-bottom: 2px solid var(--sds-rule-firm);
+}
+.sds-section > h2 .n { color: var(--sds-ink-3); margin-right: .5em; font-variant-numeric: tabular-nums; }
+.sds-intro { margin-top: var(--sds-sp-4); color: var(--sds-ink-2); }
+.sds-block { margin-top: var(--sds-sp-5); }
+.sds-block > h3 { font-size: var(--sds-fs-h2); margin-bottom: var(--sds-sp-3); }
+
+/* derived content is computed, never hand-written. Say so in the document. */
+.sds-derived-tag {
+  display: inline-block; margin-left: var(--sds-sp-2); padding: 1px 6px;
+  border: 1px solid var(--sds-rule-firm); border-radius: var(--sds-r-1);
+  font-size: var(--sds-fs-micro); font-weight: var(--sds-fw-normal);
+  color: var(--sds-ink-3); vertical-align: middle; letter-spacing: 0;
+}
+
+/* ------------------------------------------------------ decision request */
+/* Pinned near the top of every document. What am I being asked to approve. */
+.sds-decision {
+  border: 2px solid var(--sds-accent); border-radius: var(--sds-r-3);
+  background: var(--sds-surface); padding: var(--sds-sp-5);
+  box-shadow: var(--sds-sh-1);
+}
+.sds-decision > h3 {
+  display: flex; align-items: center; gap: var(--sds-sp-2);
+  color: var(--sds-accent); font-size: var(--sds-fs-h2); margin-bottom: var(--sds-sp-4);
+}
+.sds-decision > h3::before {
+  content: ""; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--sds-accent); flex: none;
+}
+.sds-ask { counter-increment: ask; padding: var(--sds-sp-3) 0; border-top: 1px solid var(--sds-rule); }
+.sds-ask:first-of-type { border-top: 0; padding-top: 0; }
+.sds-ask-line { display: flex; gap: var(--sds-sp-3); align-items: baseline; }
+.sds-ask-no {
+  flex: none; width: 1.6em; height: 1.6em; display: grid; place-items: center;
+  border-radius: 50%; background: var(--sds-accent-bg); color: var(--sds-accent);
+  font-size: var(--sds-fs-small); font-weight: var(--sds-fw-bold);
+}
+.sds-ask-text { font-weight: var(--sds-fw-medium); font-size: 15px; }
+.sds-ask-why { margin: var(--sds-sp-2) 0 0 calc(1.6em + var(--sds-sp-3)); color: var(--sds-ink-2); font-size: var(--sds-fs-small); }
+.sds-ask-meta { margin: var(--sds-sp-2) 0 0 calc(1.6em + var(--sds-sp-3)); font-size: var(--sds-fs-micro); color: var(--sds-ink-3); }
+
+/* ------------------------------------------------------------- KPI tiles */
+.sds-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: var(--sds-sp-3); }
+.sds-tile {
+  background: var(--sds-surface); border: 1px solid var(--sds-rule);
+  border-radius: var(--sds-r-2); padding: var(--sds-sp-4);
+}
+.sds-tile-label { font-size: var(--sds-fs-micro); color: var(--sds-ink-3); text-transform: uppercase; letter-spacing: .04em; }
+.sds-tile-value { font-size: 30px; font-weight: var(--sds-fw-bold); letter-spacing: var(--sds-tracking-tight); margin-top: var(--sds-sp-1); }
+.sds-tile-value .u { font-size: 15px; font-weight: var(--sds-fw-medium); color: var(--sds-ink-2); margin-left: 2px; }
+.sds-tile-note { font-size: var(--sds-fs-micro); color: var(--sds-ink-3); margin-top: var(--sds-sp-1); }
+.sds-tile[data-state="good"] { border-left: 3px solid var(--sds-good); }
+.sds-tile[data-state="warn"] { border-left: 3px solid var(--sds-warn); }
+.sds-tile[data-state="crit"] { border-left: 3px solid var(--sds-crit); }
+
+/* --------------------------------------------------------------- bullets */
+.sds-bullets { list-style: none; padding: 0; }
+.sds-bullets > li { position: relative; padding-left: var(--sds-sp-4); margin-bottom: var(--sds-sp-2); max-width: var(--sds-prose-max); }
+.sds-bullets > li::before {
+  content: ""; position: absolute; left: 3px; top: .62em;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--sds-rule-firm);
+}
+.sds-bullets > li[data-emph="1"]::before { background: var(--sds-accent); }
+.sds-bullets > li[data-emph="1"] { font-weight: var(--sds-fw-medium); }
+
+/* --------------------------------------------------------------- callout */
+.sds-callout {
+  border-left: 3px solid var(--sds-info); background: var(--sds-info-bg);
+  padding: var(--sds-sp-4); border-radius: 0 var(--sds-r-2) var(--sds-r-2) 0;
+}
+.sds-callout[data-kind="warn"] { border-color: var(--sds-warn); background: var(--sds-warn-bg); }
+.sds-callout[data-kind="crit"] { border-color: var(--sds-crit); background: var(--sds-crit-bg); }
+.sds-callout[data-kind="good"] { border-color: var(--sds-good); background: var(--sds-good-bg); }
+.sds-callout > .t { font-weight: var(--sds-fw-bold); margin-bottom: var(--sds-sp-1); }
+
+/* ----------------------------------------------------------------- table */
+.sds-grain {
+  font-size: var(--sds-fs-micro); color: var(--sds-ink-2);
+  background: var(--sds-sunk); border-radius: var(--sds-r-1);
+  padding: 3px var(--sds-sp-2); display: inline-block; margin-bottom: var(--sds-sp-2);
+  font-family: var(--sds-font-mono);
+}
+.sds-caption { font-size: var(--sds-fs-small); color: var(--sds-ink-2); margin-bottom: var(--sds-sp-2); max-width: var(--sds-prose-max); }
+.sds-tablebar { display: flex; flex-wrap: wrap; gap: var(--sds-sp-2); align-items: center; margin-bottom: var(--sds-sp-2); }
+.sds-search {
+  font: inherit; font-size: var(--sds-fs-small); padding: 5px var(--sds-sp-2);
+  border: 1px solid var(--sds-rule-firm); border-radius: var(--sds-r-1);
+  background: var(--sds-surface); color: var(--sds-ink); min-width: 190px;
+}
+.sds-btn {
+  font: inherit; font-size: var(--sds-fs-small); padding: 5px var(--sds-sp-3);
+  border: 1px solid var(--sds-rule-firm); border-radius: var(--sds-r-1);
+  background: var(--sds-surface); color: var(--sds-ink-2); cursor: pointer;
+}
+.sds-btn:hover { border-color: var(--sds-accent); color: var(--sds-accent); }
+.sds-btn[aria-pressed="true"] { background: var(--sds-accent-bg); border-color: var(--sds-accent); color: var(--sds-accent); }
+.sds-rowcount { font-size: var(--sds-fs-micro); color: var(--sds-ink-3); margin-left: auto; font-variant-numeric: tabular-nums; }
+
+/* Wide content scrolls inside its own box. The page body never scrolls
+   sideways. */
+.sds-tablewrap {
+  overflow: auto; max-height: var(--sds-table-max-h);
+  border: 1px solid var(--sds-rule); border-radius: var(--sds-r-2);
+  background: var(--sds-surface);
+}
+table.sds-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: var(--sds-fs-small); }
+table.sds-table thead th {
+  position: sticky; top: 0; z-index: 2;
+  background: var(--sds-surface); color: var(--sds-ink-2);
+  text-align: left; font-weight: var(--sds-fw-bold); white-space: nowrap;
+  padding: var(--sds-sp-2) var(--sds-sp-3);
+  border-bottom: 2px solid var(--sds-accent);
+}
+table.sds-table tbody td {
+  padding: var(--sds-sp-2) var(--sds-sp-3);
+  border-bottom: 1px solid var(--sds-rule);
+  vertical-align: top;
+}
+table.sds-table tbody tr:last-child td { border-bottom: 0; }
+table.sds-table tbody tr:hover td { background: var(--sds-sunk); }
+table.sds-table td.num, table.sds-table th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.sds-table td.wrap { white-space: normal; min-width: 16ch; }
+table.sds-table th.sticky-col, table.sds-table td.sticky-col {
+  position: sticky; left: 0; background: var(--sds-surface); z-index: 1;
+  border-right: 1px solid var(--sds-rule);
+}
+table.sds-table thead th.sticky-col { z-index: 3; }
+table.sds-table tr[hidden] { display: none; }
+/* Columns hidden by the core/all toggle. */
+table.sds-table [data-col-extra="1"] { display: none; }
+.sds-tablewrap[data-cols="all"] [data-col-extra="1"] { display: table-cell; }
+
+/* ---------------------------------------------------------------- badges */
+.sds-badge {
+  display: inline-block; padding: 1px 7px; border-radius: 999px;
+  font-size: var(--sds-fs-micro); font-weight: var(--sds-fw-medium); white-space: nowrap;
+}
+.sds-badge[data-s="ok"]   { background: var(--sds-good-bg); color: var(--sds-good); }
+.sds-badge[data-s="warn"] { background: var(--sds-warn-bg); color: var(--sds-warn); }
+.sds-badge[data-s="crit"] { background: var(--sds-crit-bg); color: var(--sds-crit); }
+.sds-badge[data-s="info"] { background: var(--sds-info-bg); color: var(--sds-info); }
+.sds-badge[data-s="na"]   { background: var(--sds-na-bg);   color: var(--sds-na); }
+
+/* ---------------------------------------------------------------- charts */
+/* The takeaway renders ABOVE the chart, in bold. A chart without a stated
+   conclusion is a puzzle, so the renderer refuses to emit one. */
+.sds-takeaway {
+  font-weight: var(--sds-fw-bold); font-size: 15px;
+  margin-bottom: var(--sds-sp-3); max-width: var(--sds-prose-max);
+}
+.sds-chart { background: var(--sds-surface); border: 1px solid var(--sds-rule); border-radius: var(--sds-r-2); padding: var(--sds-sp-4); }
+.sds-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sds-chart .axis line, .sds-chart .axis path { stroke: var(--sds-rule); }
+.sds-chart .grid line { stroke: var(--sds-rule); stroke-dasharray: 2 3; }
+.sds-chart text { fill: var(--sds-ink-2); font-size: 11px; font-family: var(--sds-font-sans); }
+.sds-chart .lbl-value { fill: var(--sds-ink); font-weight: var(--sds-fw-medium); }
+.sds-chart .s1 { fill: var(--sds-series-1); }  .sds-chart .stroke-s1 { stroke: var(--sds-series-1); }
+.sds-chart .s2 { fill: var(--sds-series-2); }  .sds-chart .stroke-s2 { stroke: var(--sds-series-2); }
+.sds-chart .s3 { fill: var(--sds-series-3); }  .sds-chart .stroke-s3 { stroke: var(--sds-series-3); }
+.sds-chart .s4 { fill: var(--sds-series-4); }  .sds-chart .stroke-s4 { stroke: var(--sds-series-4); }
+.sds-legend { display: flex; flex-wrap: wrap; gap: var(--sds-sp-2) var(--sds-sp-4); margin-top: var(--sds-sp-3); font-size: var(--sds-fs-micro); color: var(--sds-ink-2); }
+.sds-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.sds-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+
+/* heat grid */
+.sds-heat { border-collapse: separate; border-spacing: 2px; font-size: var(--sds-fs-micro); }
+.sds-heat th { color: var(--sds-ink-3); font-weight: var(--sds-fw-medium); padding: 2px 6px; text-align: left; white-space: nowrap; }
+.sds-heat td { text-align: center; padding: var(--sds-sp-2) var(--sds-sp-1); border-radius: var(--sds-r-1); min-width: 40px; color: var(--sds-ink); }
+.sds-heat td[data-h="0"] { background: var(--sds-sunk); color: var(--sds-ink-3); }
+.sds-heat td[data-h="1"] { background: var(--sds-ramp-1); }
+.sds-heat td[data-h="2"] { background: var(--sds-ramp-2); }
+.sds-heat td[data-h="3"] { background: var(--sds-ramp-3); color: #fff; }
+.sds-heat td[data-h="4"] { background: var(--sds-ramp-4); color: #fff; }
+.sds-heat td[data-flag="gap"]   { outline: 2px solid var(--sds-crit); }
+.sds-heat td[data-flag="conc"]  { outline: 2px solid var(--sds-warn); }
+.sds-flagkey { display: flex; gap: var(--sds-sp-4); font-size: var(--sds-fs-micro); color: var(--sds-ink-3); margin-top: var(--sds-sp-2); }
+
+/* --------------------------------------------------------------- footer */
+.sds-foot {
+  margin-top: var(--sds-sp-9); padding-top: var(--sds-sp-4);
+  border-top: 1px solid var(--sds-rule);
+  font-size: var(--sds-fs-micro); color: var(--sds-ink-3);
+  display: flex; flex-wrap: wrap; gap: var(--sds-sp-2) var(--sds-sp-5);
+}
+.sds-foot code { color: var(--sds-ink-2); }
+
+/* ---------------------------------------------------------------- print */
+/* These documents get printed and forwarded as PDF. Treat print as a first
+   class target, not an afterthought. */
+@media print {
+  @page { size: A4; margin: 14mm 12mm; }
+  body { background: #fff; font-size: 10.5pt; }
+  .sds-page { max-width: none; padding: 0; }
+  .sds-toc, .sds-tablebar, .sds-btn, .sds-search { display: none !important; }
+  .sds-tablewrap { max-height: none; overflow: visible; border-radius: 0; }
+  table.sds-table thead th { position: static; }
+  /* Print shows every column: paper has no toggle. */
+  table.sds-table [data-col-extra="1"] { display: table-cell !important; }
+  .sds-section { break-inside: auto; page-break-inside: auto; margin-top: 18pt; }
+  .sds-section > h2 { break-after: avoid; page-break-after: avoid; }
+  .sds-decision, .sds-tile, .sds-chart, .sds-callout { break-inside: avoid; page-break-inside: avoid; }
+  tr, .sds-ask { break-inside: avoid; page-break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+  .sds-decision { box-shadow: none; }
+}
+
+/* -------------------------------------------------------------- narrow */
+@media (max-width: 720px) {
+  .sds-page { padding: var(--sds-sp-5) var(--sds-sp-4) var(--sds-sp-8); }
+  .sds-doctitle { font-size: 28px; }
+  .sds-toc ol { columns: 1; }
+  .sds-control { gap: var(--sds-sp-1) var(--sds-sp-4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

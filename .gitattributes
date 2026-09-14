@@ -1,0 +1,7 @@
+# Golden-output tests compare bytes. CRLF conversion would break them.
+* text eol=lf
+*.png binary
+*.pptx binary
+*.xlsx binary
+*.docx binary
+*.woff2 binary

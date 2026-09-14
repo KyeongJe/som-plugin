@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-hooks.json",
+  "description": "som hooks. `timeout` is in SECONDS: the Claude Code binary does hook.timeout*1000 and names the wire field timeout_s. Every hook is fail-open (prints {} and exits 0) except the Snowflake guards, which fail closed only inside a proven Snowflake blast radius.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/resume-card.mjs\" --event SessionStart",
+            "timeout": 5
+          }
+        ],
+        "once": true
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/resume-card.mjs\" --event PostCompact",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/pre-bash-guard.mjs\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/pre-write-guard.mjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/stop-check.mjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

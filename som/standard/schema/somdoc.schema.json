@@ -1,0 +1,270 @@
+{
+  "$comment": "Generated from engine/somdoc/ir.py by standard/scripts/gen_schema.py. Do not hand-edit: the validator is the authority and this file would drift.",
+  "blocks": {
+    "appendix_source": {
+      "item_optional": [
+        "path",
+        "sheet",
+        "rows"
+      ],
+      "item_required": [
+        "name",
+        "as_of"
+      ],
+      "note": "a source without an as_of date is not provenance",
+      "required": [
+        "items"
+      ]
+    },
+    "bullets": {
+      "item_optional": [
+        "emph"
+      ],
+      "item_required": [
+        "text"
+      ],
+      "required": [
+        "items"
+      ]
+    },
+    "callout": {
+      "note": "kind: info|warn|crit|good",
+      "optional": [
+        "title"
+      ],
+      "required": [
+        "kind",
+        "body"
+      ]
+    },
+    "changelog": {
+      "item_required": [
+        "when",
+        "what",
+        "why",
+        "who"
+      ],
+      "required": [
+        "items"
+      ]
+    },
+    "chart": {
+      "note": "kind: bar|hbar|line|dot-strip|heat-grid. takeaway is required and renders above the chart in bold (R2). At most 4 series.",
+      "optional": [
+        "title",
+        "y_unit",
+        "height",
+        "label_width",
+        "src"
+      ],
+      "required": [
+        "kind",
+        "takeaway",
+        "categories",
+        "series"
+      ]
+    },
+    "decision_request": {
+      "item_optional": [
+        "owner",
+        "due",
+        "options"
+      ],
+      "item_required": [
+        "ask",
+        "rationale"
+      ],
+      "note": "at most 3 items, within the first 3 sections (R5)",
+      "required": [
+        "items"
+      ]
+    },
+    "diagram": {
+      "note": "inline SVG, embedded not linked, so the document stays self-contained",
+      "optional": [
+        "title",
+        "takeaway"
+      ],
+      "required": [
+        "svg"
+      ]
+    },
+    "heatgrid": {
+      "note": "flags: null | \"gap\" (담당 공백) | \"conc\" (단일 인원 의존)",
+      "optional": [
+        "title",
+        "flags",
+        "scale_max",
+        "caption",
+        "note"
+      ],
+      "required": [
+        "rows",
+        "columns",
+        "cells"
+      ]
+    },
+    "kpi_tiles": {
+      "item_optional": [
+        "unit",
+        "note",
+        "state"
+      ],
+      "item_required": [
+        "label",
+        "value"
+      ],
+      "note": "state: ok|warn|crit|info|na",
+      "required": [
+        "items"
+      ]
+    },
+    "matrix": {
+      "optional": [
+        "title",
+        "corner",
+        "caption",
+        "note"
+      ],
+      "required": [
+        "rows",
+        "columns",
+        "cells"
+      ]
+    },
+    "narrative": {
+      "required": [
+        "paragraphs"
+      ]
+    },
+    "risks": {
+      "item_optional": [
+        "state",
+        "state_label"
+      ],
+      "item_required": [
+        "risk",
+        "impact",
+        "mitigation",
+        "owner"
+      ],
+      "required": [
+        "items"
+      ]
+    },
+    "table": {
+      "column_optional": [
+        "key",
+        "align",
+        "core",
+        "sticky",
+        "digits",
+        "suffix",
+        "label_en"
+      ],
+      "column_required": [
+        "label"
+      ],
+      "note": "align: text|num|wrap|badge. row_grain is required (R1). > 14 columns needs at least one core:true. rows must be rectangular (R6)",
+      "optional": [
+        "title",
+        "caption",
+        "note",
+        "filter_keys",
+        "searchable"
+      ],
+      "required": [
+        "row_grain",
+        "columns",
+        "rows"
+      ]
+    }
+  },
+  "constants": {
+    "DECISION_WITHIN_SECTIONS": 3,
+    "MAX_DECISIONS": 3,
+    "SEARCHABLE_MIN": 20,
+    "WIDE_TABLE_COLS": 14
+  },
+  "docmeta": {
+    "note": "as_of and next_review are YYYY-MM-DD. R4.",
+    "optional": [
+      "subtitle",
+      "slug",
+      "org",
+      "author",
+      "approver",
+      "next_review",
+      "classification"
+    ],
+    "required": [
+      "title",
+      "version",
+      "as_of"
+    ]
+  },
+  "engine_version": "0.1.0",
+  "envelope": {
+    "doc_type": [
+      "rnr",
+      "kpi",
+      "charter",
+      "report"
+    ],
+    "optional": [
+      "lang",
+      "bilingual",
+      "metrics"
+    ],
+    "required": [
+      "sds_version",
+      "doc_type",
+      "theme",
+      "docmeta",
+      "sections"
+    ],
+    "theme": [
+      "paper",
+      "console"
+    ]
+  },
+  "metrics": {
+    "entry_one_of": [
+      "value",
+      "display"
+    ],
+    "entry_optional": [
+      "unit",
+      "source_sql",
+      "source_rows",
+      "computed_at"
+    ],
+    "entry_required": [
+      "formula"
+    ],
+    "note": "R7: formula is required. Reference a metric from prose as {{m:key}}; write {{!m:key}} to render the literal syntax."
+  },
+  "rules": {
+    "R1": "every table declares row_grain",
+    "R2": "every chart declares takeaway",
+    "R3": "every {{m:key}} resolves in metrics",
+    "R4": "docmeta has title, version, as_of",
+    "R5": "a decision_request exists within the first 3 sections, at most 3 asks (rnr/kpi/charter)",
+    "R6": "table and chart shapes are rectangular",
+    "R7": "every metric carries a formula"
+  },
+  "sds_version": 1,
+  "section": {
+    "note": "ids must be unique",
+    "optional": [
+      "title_en",
+      "intro",
+      "derived"
+    ],
+    "required": [
+      "id",
+      "title",
+      "blocks"
+    ]
+  }
+}

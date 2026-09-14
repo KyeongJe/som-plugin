@@ -1,0 +1,48 @@
+# som run state — per-project.
+#
+# patterns.json is the exception and it is deliberate: the learn skill says the
+# project-scope library is "the one worth committing", and an ignore rule on
+# the whole directory made that claim false in the one repository where anyone
+# could check it. Run state stays out; what was learned can travel.
+# `**/` matters: a pattern containing a slash is anchored to this file's
+# directory, so `.som/*` stopped ignoring `som/.som/` and a run-state ledger
+# reached a commit within the hour.
+**/.som/*
+!**/.som/patterns.json
+.somrc.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Node
+node_modules/
+
+# OS / editor
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+
+# Secrets — never, under any circumstance
+*.p8
+*.pem
+id_rsa*
+sf_login_info.json
+connections.toml
+.env
+.env.*
+
+# Large local data
+*.parquet
+*.xlsb
+_cache/
+
+# A subprocess launched with SYSTEMROOT unset makes Windows expand %SystemDrive%
+# into a literal directory here. It reached a commit once.
+%SystemDrive%/
+%*%/

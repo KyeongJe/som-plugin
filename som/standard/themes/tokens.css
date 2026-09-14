@@ -1,0 +1,122 @@
+/* SOM Doc Standard (SDS) v1 - design tokens
+ *
+ * Two themes, one token set:
+ *   sds-paper    team governance documents (R&R, charter)   warm paper, red accent
+ *   sds-console  data reports and KPI documents             cool surface, blue accent
+ *
+ * Both palettes are lifted from documents that already went to this audience,
+ * so they are calibrated rather than invented.
+ *
+ * Rules that are not negotiable:
+ *   - No @import and no link to fonts.googleapis.com. A single-file document
+ *     must not make an outbound request: it breaks on an air-gapped laptop and
+ *     leaks that the file was opened. Local fallback stack only; embedding
+ *     woff2 as base64 is opt-in via `somdoc build --embed-fonts`.
+ *   - Numbers are tabular everywhere. Column alignment in a table of figures is
+ *     not a preference.
+ *   - Committed light look. These are printed and forwarded documents, so the
+ *     ground is declared explicitly and `color-scheme` is pinned.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ---- type scale ---------------------------------------------------- */
+  --sds-fs-display: 40px;
+  --sds-fs-h1:      28px;
+  --sds-fs-h2:      20px;
+  --sds-fs-h3:      15px;
+  --sds-fs-body:    14px;
+  --sds-fs-small:   12.5px;
+  --sds-fs-micro:   11px;
+
+  --sds-lh-display: 1.15;
+  --sds-lh-head:    1.3;
+  --sds-lh-body:    1.55;
+  --sds-tracking:   -0.01em;
+  --sds-tracking-tight: -0.02em;
+
+  --sds-fw-normal:  400;
+  --sds-fw-medium:  500;
+  --sds-fw-bold:    650;
+
+  --sds-font-sans: "IBM Plex Sans KR", "Pretendard", "Malgun Gothic",
+                   "Apple SD Gothic Neo", system-ui, -apple-system, sans-serif;
+  --sds-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas,
+                   "D2Coding", monospace;
+
+  /* ---- spacing (4px base) -------------------------------------------- */
+  --sds-sp-1: 4px;   --sds-sp-2: 8px;   --sds-sp-3: 12px;
+  --sds-sp-4: 16px;  --sds-sp-5: 24px;  --sds-sp-6: 32px;
+  --sds-sp-7: 48px;  --sds-sp-8: 64px;  --sds-sp-9: 96px;
+
+  /* ---- radius / elevation (two levels, deliberately) ----------------- */
+  --sds-r-1: 4px;  --sds-r-2: 8px;  --sds-r-3: 14px;  --sds-r-4: 24px;
+  --sds-sh-1: 0 1px 2px rgba(16, 18, 20, .06), 0 1px 1px rgba(16, 18, 20, .04);
+  --sds-sh-2: 0 8px 24px rgba(16, 18, 20, .10), 0 2px 6px rgba(16, 18, 20, .06);
+
+  /* ---- layout -------------------------------------------------------- */
+  --sds-page-max: 1180px;
+  --sds-prose-max: 68ch;
+  --sds-table-max-h: 70vh;
+}
+
+/* ====================================================================== */
+/*  sds-paper - team governance documents                                 */
+/* ====================================================================== */
+:root,
+[data-sds-theme="paper"] {
+  --sds-bg:        #f0eee6;
+  --sds-surface:   #fbfaf5;
+  --sds-sunk:      #e6e2d6;
+  --sds-ink:       #1a1a18;
+  --sds-ink-2:     #4a4a44;
+  --sds-ink-3:     #6f6f66;
+  --sds-rule:      rgba(26, 26, 24, .14);
+  --sds-rule-firm: rgba(26, 26, 24, .28);
+  --sds-accent:    #d81e28;
+  --sds-accent-bg: rgba(216, 30, 40, .10);
+
+  --sds-good: #00704a;  --sds-good-bg: rgba(0, 112, 74, .10);
+  --sds-warn: #a86f00;  --sds-warn-bg: rgba(168, 111, 0, .10);
+  --sds-crit: #c23a39;  --sds-crit-bg: rgba(194, 58, 57, .10);
+  --sds-info: #315b8f;  --sds-info-bg: rgba(49, 91, 143, .10);
+  --sds-na:   #6f6f66;  --sds-na-bg:   rgba(111, 111, 102, .10);
+
+  /* charts: paper documents use accent + neutrals, not a rainbow */
+  --sds-series-1: #d81e28;
+  --sds-series-2: #4a4a44;
+  --sds-series-3: #a86f00;
+  --sds-series-4: #00704a;
+  --sds-ramp-1: #efe0c9; --sds-ramp-2: #e3c39c;
+  --sds-ramp-3: #cf9a6b; --sds-ramp-4: #a86f00;
+}
+
+/* ====================================================================== */
+/*  sds-console - data reports and KPI documents                          */
+/* ====================================================================== */
+[data-sds-theme="console"] {
+  --sds-bg:        #f1f4f6;
+  --sds-surface:   #ffffff;
+  --sds-sunk:      #e8edef;
+  --sds-ink:       #0f1b22;
+  --sds-ink-2:     #465a62;
+  --sds-ink-3:     #6b7f88;
+  --sds-rule:      #d7dfe1;
+  --sds-rule-firm: #b6c4c9;
+  --sds-accent:    #1c5cab;
+  --sds-accent-bg: rgba(28, 92, 171, .10);
+
+  --sds-good: #0e7a55;  --sds-good-bg: #e3f4ed;
+  --sds-warn: #a86f00;  --sds-warn-bg: #fbf2dc;
+  --sds-crit: #c23a39;  --sds-crit-bg: #fbe9e8;
+  --sds-info: #1c5cab;  --sds-info-bg: #e6eef8;
+  --sds-na:   #6b7f88;  --sds-na-bg:   #eef2f4;
+
+  --sds-series-1: #2a78d6;
+  --sds-series-2: #eb6834;
+  --sds-series-3: #1baf7a;
+  --sds-series-4: #eda100;
+  --sds-ramp-1: #86b6ef; --sds-ramp-2: #5598e7;
+  --sds-ramp-3: #2a78d6; --sds-ramp-4: #1c5cab;
+}

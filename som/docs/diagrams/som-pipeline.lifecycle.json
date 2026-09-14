@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "som 5-stage gate pipeline",
+    "subtitle": "게이트는 산문이 아니라 코드가 판정한다. 통과 조건을 만족하지 못하면 다음 스테이지가 열리지 않는다.",
+    "viewBox": [
+      1120,
+      640
+    ],
+    "quality_profile": "standard"
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "스테이지"
+    },
+    {
+      "id": "exc",
+      "label": "예외 경로"
+    }
+  ],
+  "states": [
+    {
+      "id": "intake",
+      "type": "start",
+      "lane": "main",
+      "col": 0,
+      "step": "01",
+      "label": "INTAKE",
+      "sublabel": "요청을 명세로",
+      "tag": "사람"
+    },
+    {
+      "id": "blueprint",
+      "type": "active",
+      "lane": "main",
+      "col": 1,
+      "step": "02",
+      "label": "BLUEPRINT",
+      "sublabel": "DAG · writes 글롭",
+      "tag": "코디네이터"
+    },
+    {
+      "id": "execute",
+      "type": "active",
+      "lane": "main",
+      "col": 2,
+      "step": "03",
+      "label": "EXECUTE",
+      "sublabel": "워커 wave 병렬",
+      "tag": "워커 N"
+    },
+    {
+      "id": "attest",
+      "type": "active",
+      "lane": "main",
+      "col": 3,
+      "step": "04",
+      "label": "ATTEST",
+      "sublabel": "독립 검증",
+      "tag": "다른 dispatch"
+    },
+    {
+      "id": "deliver",
+      "type": "success",
+      "lane": "main",
+      "col": 4,
+      "step": "05",
+      "label": "DELIVER",
+      "sublabel": "bundle 발행",
+      "tag": "사람"
+    },
+    {
+      "id": "rework",
+      "type": "waiting",
+      "lane": "exc",
+      "col": 1,
+      "step": "R",
+      "label": "재개",
+      "sublabel": "최대 2회 · 초과 시 사람",
+      "tag": "자동"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "g0",
+      "from": "intake",
+      "to": "blueprint",
+      "label": "G0",
+      "variant": "security",
+      "labelDy": -25
+    },
+    {
+      "id": "g1",
+      "from": "blueprint",
+      "to": "execute",
+      "label": "G1",
+      "variant": "security",
+      "labelDy": -25
+    },
+    {
+      "id": "done",
+      "from": "execute",
+      "to": "attest",
+      "label": "정산",
+      "variant": "emphasis",
+      "labelDy": -25
+    },
+    {
+      "id": "g2",
+      "from": "attest",
+      "to": "deliver",
+      "label": "G2",
+      "variant": "security",
+      "labelDy": -25
+    },
+    {
+      "id": "g2fail",
+      "from": "attest",
+      "to": "rework",
+      "label": "불일치",
+      "variant": "default",
+      "route": "drop"
+    },
+    {
+      "id": "retry",
+      "from": "rework",
+      "to": "execute",
+      "label": "재개",
+      "variant": "default",
+      "route": "drop"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "게이트 통과 조건 (코드가 판정)",
+      "items": [
+        "G0 — grain 선언 · 기간 · SALESORG 범위 · acceptance 표. 하나라도 없으면 안 열린다",
+        "G1 — 모든 DAG 노드에 writes 글롭. 빈 글롭 노드는 스키마가 거부. 최장 경로 ≤4",
+        "G2 — 인쇄된 모든 숫자가 metrics.json key 로 역추적 가능. 인원별 % 합 = 100",
+        "G3 — 항상 사람 서명. 자동 발송·자동 복사 없음"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "EXECUTE 안에서 일어나는 일",
+      "items": [
+        "Orca 는 스케줄링·동시성·충돌 판단을 하지 않는다 — 루프를 직접 쓴다",
+        "writes 글롭이 교차하는 두 태스크는 다음 wave 로 미룬다 (워크트리 격리 아님)",
+        "동시 워커 기본 3, current 체크아웃에서 하드 캡 4, 중첩 깊이 1",
+        "worker_done 정산 후 터미널을 재사용·retain·release 중 하나로 반드시 회계"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "느린 것과 실패한 것은 다르다",
+      "items": [
+        "check --wait 타임아웃 · count:0 은 체크포인트다 — 실패가 아니다",
+        "코딩 태스크 15~60분은 정상. heartbeat 는 살아있다는 뜻이고 끝났다는 뜻이 아니다",
+        "태스크 3회 연속 실패 → Orca circuit-break. 동일 설정 재시도 금지",
+        "신뢰가 해제할 수 없는 것: Snowflake 쓰기 · 자기 게이트 해제 · reset"
+      ]
+    }
+  ]
+}

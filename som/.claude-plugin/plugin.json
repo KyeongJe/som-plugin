@@ -1,0 +1,25 @@
+{
+  "name": "som",
+  "version": "0.2.0",
+  "displayName": "som — SOM work orchestration",
+  "description": "Stage-gated multi-agent runs on the Orca CLI plus the SOM Doc Standard. Ambiguity-gated intake, wave scheduling with write-conflict avoidance, autonomy levels with frozen hard floors, Snowflake access that runs reads and asks before writes, and self-contained local-file deliverables (HTML and xlsx today; docx and pptx are not implemented yet).",
+  "author": {
+    "name": "Kyeong Je Kim",
+    "email": "kykim@ivyent.com"
+  },
+  "homepage": "https://github.com/KyeongJe/som-claude-plugin",
+  "repository": "https://github.com/KyeongJe/som-claude-plugin",
+  "license": "MIT",
+  "keywords": [
+    "orca",
+    "orchestration-engine",
+    "multi-agent",
+    "wave-scheduler",
+    "stage-gate",
+    "autonomy-level",
+    "snowflake-guard",
+    "document-standard",
+    "single-file-html"
+  ],
+  "_note": "hooks and monitors are auto-discovered from hooks/hooks.json and monitors/monitors.json. Declaring them as path strings in this manifest makes the plugin fail to load -- verified by bisection. bkit does not declare them either."
+}
