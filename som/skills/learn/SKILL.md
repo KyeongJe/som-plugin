@@ -2,7 +2,9 @@
 name: learn
 description: |
   Extract reusable patterns from what just happened and put them where the
-  next run will see them. Reads a finished run, a debugging session, or a
+  next run will see them. A finished `conduct` run already records what it
+  measured by itself -- out-of-scope writes, repeated attempts, nodes a person
+  had to unblock -- so this skill is for the lessons only a person can see. Reads a finished run, a debugging session, or a
   review, proposes patterns with a trigger, an action and cited evidence, and
   refuses anything it cannot check. Matched patterns are injected into future
   worker briefs, graded against the outcome of the run that carried them, and

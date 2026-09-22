@@ -20,69 +20,51 @@ jobs:
       - name: Install pinned dependencies
         run: pip install -r som/engine/requirements.txt
 
-      # Manifest rules first: a manifest error makes the plugin fail to load,
-      # which is a symptom with no visible cause.
-      # Manifest rules also assert that every path a skill tells you to open
-      # exists, and that the generated schema matches ir.py.
-      - name: Manifest rules
+      # Globbed, not listed.
+      #
+      # These steps used to name eight test files by hand, and the list went
+      # stale the day test_write_path.py was added: 28 tests covering the
+      # Snowflake write approval -- the most dangerous path in the plugin --
+      # ran nowhere, and CI stayed green. The same defect had already hit
+      # docs/make_images.py three times, which is why that file refuses to
+      # draw when a test lands in no bucket.
+      #
+      # So: every test_*.py on disk runs. A suite that prints no "N/M passed"
+      # line fails the job rather than passing silently, and a suite count
+      # below what exists today fails too -- deleting a suite has to be a
+      # deliberate edit here, not a quiet one.
+      - name: Python tests — every engine/tests/test_*.py
         working-directory: som
         env:
           PYTHONUTF8: "1"
-        run: python engine/tests/test_manifest.py
-
-      - name: IR rules and golden render
-        working-directory: som
-        env:
-          PYTHONUTF8: "1"
-        run: python engine/tests/test_ir.py
-
-      # The kpi and charter skeletons were advertised in four places and had
-      # never been turned into a document. This builds all three and re-renders
-      # from the committed IR copy to check the byte-identical claim.
-      - name: Skeletons build, and validate() never crashes
-        working-directory: som
-        env:
-          PYTHONUTF8: "1"
-        run: python engine/tests/test_skeletons.py
-
-      # Diagram text that overflows its canvas or collides with a neighbour
-      # shipped in the README three times. The SVGs are generated, so nothing
-      # noticed until someone looked at the page.
-      - name: Diagram text fits and does not collide
-        working-directory: som
-        env:
-          PYTHONUTF8: "1"
-        run: python engine/tests/test_diagrams.py
-
-      # The first thirty minutes for someone who has only Claude Code:
-      # doctor, pick a recipe, see the questions, settle the interview, run,
-      # render. Nothing here needs network, credentials, Orca, or a worker.
-      - name: A bare machine can walk the documented path
-        working-directory: som
-        env:
-          PYTHONUTF8: "1"
-        run: python engine/tests/test_bare_walkthrough.py
-
-      - name: humanize invariants
-        working-directory: som
-        env:
-          PYTHONUTF8: "1"
-        run: python engine/tests/test_humanize_io.py
-
-      - name: Snowflake classifier and cost guard
-        working-directory: som
-        env:
-          PYTHONUTF8: "1"
-        run: python engine/tests/test_somsql.py
-
-      # What a teammate gets with nothing installed but Claude: no pandas,
-      # no openpyxl, no sqlglot, no Orca. The HTML path has to survive that,
-      # because that is the floor the plugin promises.
-      - name: Works with nothing but the standard library
-        working-directory: som
-        env:
-          PYTHONUTF8: "1"
-        run: python engine/tests/test_bare_install.py
+          PYTHONPATH: engine
+        run: |
+          set -eu
+          found=0
+          for f in engine/tests/test_*.py; do
+            found=$((found + 1))
+            echo "::group::$f"
+            out=$(python "$f")
+            echo "$out"
+            echo "::endgroup::"
+            line=$(echo "$out" | grep -E '^[0-9]+/[0-9]+ passed$' | tail -1 || true)
+            if [ -z "$line" ]; then
+              echo "::error::$f did not report 'N/M passed'"
+              exit 1
+            fi
+            got=${line%%/*}
+            rest=${line#*/}
+            total=${rest%% *}
+            if [ "$got" != "$total" ]; then
+              echo "::error::$f is $line"
+              exit 1
+            fi
+          done
+          if [ "$found" -lt 9 ]; then
+            echo "::error::only $found python suites ran; expected at least 9"
+            exit 1
+          fi
+          echo "$found python suites, all green"
 
       # Everything on the Node side: the Snowflake bypass guards (which matter
       # in both directions -- deny outside the entrypoint, never block

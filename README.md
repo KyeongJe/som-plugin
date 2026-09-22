@@ -72,9 +72,17 @@ Orca 도 없이 **여섯 가지 업무 중 다섯이 그대로 돕니다.** 나�
   <img alt="런이 끝나면 패턴을 제안하고, 근거가 있으면 저장하고, 다음 런에 주입하고, 결과로 신뢰도를 조정한다" src="som/docs/img/learning-loop-light.svg">
 </picture>
 
-"워커에게는 절대경로를 준다" 같은 교훈을 근거와 함께 저장하면 다음 런이 자동으로
-읽습니다. 근거 없는 격언, 없는 파일을 가리키는 근거, 자격증명이 섞인 패턴은
-**저장 단계에서 거부**됩니다. 맞은 패턴은 신뢰도가 오르고 빗나간 패턴은 내려갑니다.
+**런이 끝나면 엔진이 직접 기록합니다.** 선언한 범위 밖 파일을 고친 노드, 두 번
+넘게 재시도한 노드, 사람이 풀어줘야 진행된 노드 — 전부 엔진이 **실제로 관측한**
+것이고, 노드 이름과 실제 경로가 채워진 문장으로 남습니다.
+
+`/som:learn` 으로 직접 적어 넣을 수도 있습니다. 어느 쪽이든 게이트는 같습니다 —
+근거 없는 격언, 없는 파일을 가리키는 근거, 자격증명이 섞인 패턴은 **저장 단계에서
+거부**됩니다. 맞은 패턴은 신뢰도가 오르고 빗나간 패턴은 내려갑니다.
+
+엔진이 스스로 적은 것은 **신뢰도 25 에서 시작**합니다(사람이 적은 것은 40). 한 번
+본 것과 사람이 "이건 교훈이다" 라고 판단한 것은 무게가 달라야 하고, 스킬로 승격되려면
+평균 70 이 필요하니 자동 관측은 **여섯 번쯤 맞아야** 승격 후보가 됩니다.
 
 ### ②-b 쓸수록 나한테 맞춰집니다 — 스스로 스킬을 만듭니다
 
@@ -302,7 +310,7 @@ Orca 를 쓸 때는 이 플러그인이 **스케줄링을 직접 합니다** —
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="som/docs/img/graph-tests-dark.svg">
-  <img alt="테스트 362건 전부 통과: 패턴 학습·스킬 승격 62건, SQL 분류·비용 리포트·쓰기 승인 55건, 모호도 게이트 52건, Orca 어댑터·효율·릴리스 게이트 45건, 우회 가드 32건, 자율 레벨·플로어 31건, IR 규칙과 golden 25건, 문서·매니페스트·공개 위생 22건, humanize 불변식 11건, 맨몸 설치·워크스루 11건, 스켈레톤·다이어그램 렌더 9건, 인터뷰와 라우팅 7건" src="som/docs/img/graph-tests-light.svg">
+  <img alt="테스트 373건 전부 통과: 패턴 학습·자동 기록·스킬 승격 73건, SQL 분류·비용 리포트·쓰기 승인 55건, 모호도 게이트 52건, Orca 어댑터·효율·릴리스 게이트 45건, 우회 가드 32건, 자율 레벨·플로어 31건, IR 규칙과 golden 25건, 문서·매니페스트·공개 위생 22건, humanize 불변식 11건, 맨몸 설치·워크스루 11건, 스켈레톤·다이어그램 렌더 9건, 인터뷰와 라우팅 7건" src="som/docs/img/graph-tests-light.svg">
 </picture>
 
 | 주장 | 어떻게 확인했나 | 결과 |
@@ -322,7 +330,7 @@ Orca 를 쓸 때는 이 플러그인이 **스케줄링을 직접 합니다** —
 | 검증기가 나쁜 입력에 안 죽는다 | 잘못된 형태 21종 | 크래시 0 · 전부 문장으로 보고 |
 
 ```bash
-node --test test/*.test.mjs                       # 229   (17개 파일)
+node --test test/*.test.mjs                       # 240   (18개 파일)
 python engine/tests/test_write_path.py  # 28
 python engine/tests/test_ir.py          # 25
 python engine/tests/test_somsql.py      # 27
@@ -331,7 +339,7 @@ python engine/tests/test_humanize_io.py # 11
 python engine/tests/test_skeletons.py   #  6
 python engine/tests/test_diagrams.py    #  3
 python engine/tests/test_bare_install.py #  6
-python engine/tests/test_bare_walkthrough.py # 5   합계 362
+python engine/tests/test_bare_walkthrough.py # 5   합계 373
 python docs/check_counts.py                       # 위 숫자가 실측과 같은지
 node test/e2e-orca.mjs                            # 실제 워커 (유료)
 node test/e2e-conduct.mjs                         # 실제 워커 (유료)

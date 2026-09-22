@@ -106,7 +106,8 @@ def measure() -> dict:
         "somsql": py("engine/tests/test_somsql.py") + py("engine/tests/test_write_path.py"),
         "guards": node_group("guard.test.mjs", "sfguard*.test.mjs"),
         "clarity": node_group("clarity*.test.mjs"),
-        "learn": node_group("patterns*.test.mjs", "promote.test.mjs"),
+        "learn": node_group("patterns*.test.mjs", "promote.test.mjs",
+                            "signals.test.mjs"),
         "intake": node_group("intake.test.mjs"),
         # autonomy.test.mjs also parses the README table; floors.test.mjs is
         # the hard floors; cli.test.mjs is the error paths.

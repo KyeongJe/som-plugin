@@ -17,6 +17,7 @@ import {
   annotateCriticalPath, validateDag, planWave, placementFor,
   concurrencyCap, launchFor, parallelismOf,
 } from "./domain/plan.mjs";
+import { signalsFrom } from "./domain/signals.mjs";
 import { clarityGate } from "./state/interview.mjs";
 import { Autonomy } from "./domain/autonomy.mjs";
 import { PatternLibrary } from "./state/patterns.mjs";
@@ -446,6 +447,40 @@ export class Conduct {
     ];
   }
 
+  /**
+   * Offer what this run demonstrably did, as patterns for the next one.
+   *
+   * The drafts come from `signals.mjs`, which only reports things the engine
+   * measured -- a write outside a declared glob, a node that needed a second
+   * attempt, a node a person had to unblock. No summary text, no judgement
+   * about what "went well": success is the baseline, not a lesson.
+   *
+   * The gate is deliberately untouched. Each draft goes through `propose()`
+   * exactly as a hand-written lesson does, so a draft too vague to name a
+   * file or a node is refused here rather than diluting the library. Refusals
+   * are the normal outcome and are not reported as failures -- they are the
+   * gate doing its job on input that was cheap to generate.
+   *
+   * Scope is `project`: these describe this repository's plan, not how the
+   * operator works in general.
+   */
+  proposeFromRun(st, nodes, runId) {
+    const drafts = signalsFrom(st, {
+      nodes: nodes ?? [], recipe: this.recipeId, runId,
+    });
+    const stored = [];
+    for (const d of drafts) {
+      let r;
+      try {
+        r = this.patterns.propose(d, { scope: "project" });
+      } catch {
+        continue;                       // a read-only library must not end a run
+      }
+      if (r?.ok) stored.push(r.pattern);
+    }
+    return stored;
+  }
+
   /** Start one wave. All members are launched before anything is awaited. */
   startWave(nodes, ids, { gitBacked, approved = false }) {
     const started = [];
@@ -760,7 +795,36 @@ export class Conduct {
                         retired.map((p) => p.title).join(", "));
     }
 
+    // Close the first link of the learning loop.
+    //
+    // This engine injected patterns and graded them, both automatically, and
+    // created none -- `propose()` was reachable only from the CLI. Unless
+    // somebody ran `/som:learn` by hand the library stayed empty forever and
+    // every later stage idled with nothing to work on. Heavy use produced zero
+    // patterns and zero promoted skills, which reads as "nothing was worth
+    // saving" and was really "nothing was ever offered".
+    //
+    // Only what this engine measured goes in: an out-of-scope write, a node
+    // that needed a second attempt, a node a person had to unblock -- with the
+    // key and real paths filled in. The gate is unchanged. These go through
+    // `propose()` like any hand-written lesson, and most of the work in
+    // `signals.mjs` is making drafts specific enough to survive it.
+    let learned = [];
+    let learnError = null;
+    try {
+      learned = this.proposeFromRun(st, nodes, runId);
+    } catch (e) {
+      learnError = e?.message ?? String(e);
+      this.showProgress(`패턴 추출 실패 (보고는 계속): ${learnError}`);
+    }
+    if (learned.length) {
+      this.showProgress(`이번 런에서 패턴 ${learned.length}건을 남겼습니다: ` +
+                        learned.map((p) => p.title).join(" · "));
+    }
+
     return {
+      patternsLearned: learned.map((p) => ({ id: p.id, title: p.title })),
+      patternLearnError: learnError,
       // Not `failed === 0`. A run whose window closed with one task still
       // dispatched reported ok:true at 1 of 3 completed -- and a caller acting
       // on that would deliver a third of a document as finished. Nothing
