@@ -47,10 +47,19 @@ node tools/release.mjs 0.2.0 --public ../som-plugin --push
 | 테스트 | node 전체 · python 전체. 하나라도 실패하면 중단 |
 | 발행된 숫자 | README 의 테스트 개수 = 실측 |
 | doctor | fail 0 |
+| **오케스트레이션 e2e** | 실제 워커로 `Conduct.run()` 실행. 단위 테스트가 안 건드리는 유일한 핵심 경로입니다 |
 | **공개 위생** | 실제 account identifier · 접속 endpoint · private key 본문 · 개발자 홈 경로 · 매니페스트 밖으로 샌 이메일 |
 | 포함 파일 | `.som/` · `_cache/` · `*.jsonl` · `*.parquet` · 키 파일 등이 섞였는지 |
 | 버전 | plugin.json · marketplace.json 2곳, 3개가 전부 같은지 |
 | CHANGELOG | 그 버전 항목이 있는지 |
+
+**e2e 가 게이트에 있는 이유.** `Conduct.run()` 은 단위 테스트가 0건입니다 — Orca 와
+유료 워커가 필요해서 240건짜리 node 스위트 어디도 부르지 않습니다. 그 사이로 실제
+결함이 나갔습니다: `const pf` 가 `if` 블록 안으로 들어가면서 아래 두 사용처가
+`ReferenceError` 를 냈고, **병렬 런(`prd`·`build`)이 전부 죽는데 373건은 초록**이었습니다.
+손으로 돌려서 찾았는데, 손은 장치가 아닙니다. 그래서 여기 있습니다.
+
+Orca 가 없는 머신이면 `--no-e2e` 로 건너뛸 수 있지만, **건너뛰었다고 출력에 찍힙니다.**
 
 공개 위생 검사는 `tools/gate.mjs` 이고 `som/test/release.test.mjs` 가 검사합니다 —
 막아야 할 것과 막으면 안 되는 것을 짝으로 둡니다. **오탐이 있는 게이트는

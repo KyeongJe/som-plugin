@@ -114,6 +114,44 @@ const dm = doctor.out.match(/(\d+) ok · (\d+) warn · (\d+) fail/);
 if (dm && dm[3] !== "0") stop("doctor 가 실패 항목을 보고합니다", [dm[0]]);
 say(`  doctor ${dm ? dm[0] : "(출력을 읽지 못함)"}`);
 
+// -- the orchestrator itself, with real workers ---------------------------
+//
+// `Conduct.run()` has no unit test. Nothing in the 240-test node suite calls
+// it, because it needs Orca and paid workers, so the live e2e is the only
+// thing that executes the plugin's central path.
+//
+// That gap shipped a real defect: `const pf` was moved inside an `if` block
+// and the two later reads of it threw `ReferenceError: pf is not defined`.
+// Every parallel run -- `prd` and `build`, the only recipes with a wave wider
+// than one -- died at the first state save, while all 373 tests stayed green.
+// It was found by running the e2e by hand, which is not a mechanism.
+//
+// So it runs here, where Orca is present and a release is about to go out.
+// Skipping is allowed on a machine without Orca, but only by asking for it,
+// and the skip is printed rather than assumed.
+if (has("no-e2e")) {
+  say("  e2e  건너뜀 (--no-e2e). Conduct.run() 은 이번 릴리스에서 실행되지 않았습니다.");
+} else {
+  const pre = quiet("node", ["bin/som.mjs", "conduct", "preflight"], { cwd: SOM });
+  if (!pre.ok || !/ready/.test(pre.out)) {
+    stop("Orca 가 준비되지 않아 e2e 를 돌리지 못했습니다", [
+      pre.out.trim().split("\n").slice(0, 4).join(" · "),
+      "Orca 를 켜고 다시 시도하거나, 의도한 것이라면 --no-e2e 를 붙이세요.",
+      "그 경우 Conduct.run() 은 이 릴리스에서 한 번도 실행되지 않습니다.",
+    ]);
+  }
+  say("  e2e  실제 워커로 오케스트레이션 실행 중 (2분 내외)…");
+  const e2e = quiet("node", ["test/e2e-conduct.mjs"], { cwd: SOM });
+  if (!e2e.ok || !/conduct e2e PASSED/.test(e2e.out)) {
+    stop("오케스트레이션 e2e 가 실패합니다", [
+      ...e2e.out.split("\n").filter((l) => /FAIL|ERROR/.test(l)).slice(0, 8),
+      "단위 테스트가 전부 통과해도 run() 은 여기서만 실행됩니다.",
+    ]);
+  }
+  const waves = (e2e.out.match(/^wave \d+/gm) ?? []).length;
+  say(`  e2e  통과 · wave ${waves}개 · 터미널 누수 0`);
+}
+
 // ------------------------------------------------------- 3. the file set
 say("\n[3/5] 공개 대상 파일");
 const tracked = run("git", ["ls-files", "-z"]).split("\0").filter(Boolean);

@@ -622,8 +622,16 @@ export class Conduct {
     // to be the first thing in this method, so a recipe that schedules
     // 1-1-1-1-1 -- four of the six -- refused to start for want of a tool it
     // would never have used, and sent the person off to a different command.
+    // Declared out here, not inside the `if`. It used to be block-scoped, and
+    // the two places below that read `pf.runtimeId` and `pf.worktreeId` threw
+    // `ReferenceError: pf is not defined` -- so every parallel run died the
+    // moment it tried to save state. That is `prd` and `build`, the only two
+    // recipes with a wave wider than one, and no unit test touches `run()`:
+    // the live e2e is the only thing that executes this path, and it is not in
+    // the default suite because it needs Orca and real workers.
+    let pf = {};
     if (!plan.singleAgent) {
-      const pf = this.preflight();
+      pf = this.preflight();
       if (pf.problems.length) {
         for (const p of pf.problems) this.say(`중단: ${p}`);
         return { ok: false, problems: pf.problems, plan };
