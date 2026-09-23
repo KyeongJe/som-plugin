@@ -73,17 +73,17 @@ test("a clean run teaches nothing", () => {
 });
 
 test("one retry is weather; two is a pattern", () => {
-  const once = {
+  // `attempts` is what the scheduler itself keeps, in state.tasks. A live run
+  // showed that `state.events` -- which an earlier draft of this module read --
+  // has never existed: events are appended to .som/events.ndjson and reach
+  // this function through the `events` option.
+  const ran = (attempts) => ({
+    tasks: { t1: { key: "render", attempts } },
     dispatches: { d1: { key: "render", outcome: "succeeded", filesModified: ["src/render/a.mjs"] } },
-    events: [{ kind: "retry", key: "render" }],
-  };
-  assert.deepEqual(signalsFrom(once, { nodes: NODES, runId: "run_1" }), []);
+  });
+  assert.deepEqual(signalsFrom(ran(2), { nodes: NODES, runId: "run_1" }), []);
 
-  const twice = {
-    dispatches: { d1: { key: "render", outcome: "succeeded", filesModified: ["src/render/a.mjs"] } },
-    events: [{ kind: "retry", key: "render" }, { kind: "retry", key: "render" }],
-  };
-  const [d] = signalsFrom(twice, { nodes: NODES, recipe: "build", runId: "run_1" });
+  const [d] = signalsFrom(ran(3), { nodes: NODES, recipe: "build", runId: "run_1" });
   assert.match(d.title, /render/);
   assert.match(d.action, /쪼갠다/);
   assert.match(d.action, /src\/render\/a\.mjs/);
@@ -94,18 +94,24 @@ test("a node that never passed is not yet a lesson", () => {
   // worked in the end; a task that failed outright needs a person, not a
   // pattern asserting how to size it.
   const stillFailing = {
+    tasks: { t1: { key: "render", attempts: 3 } },
     dispatches: { d1: { key: "render", outcome: "failed", filesModified: [] } },
-    events: [{ kind: "retry", key: "render" }, { kind: "retry", key: "render" }],
   };
   assert.deepEqual(signalsFrom(stillFailing, { nodes: NODES, runId: "run_1" }), []);
 });
 
 test("an escalation says the plan was missing an input", () => {
+  // The real event carries a task id and no key -- exactly what a live run
+  // produced -- so the task table is what turns it into a node name. Without
+  // that the pattern read "task_143c6761ce82 는 사람에게 물어봐야 진행된다".
   const blocked = {
+    tasks: { task_abc: { key: "kpi-schema" } },
     dispatches: { d1: { key: "kpi-schema", outcome: "succeeded", violations: [] } },
-    events: [{ kind: "escalation", key: "kpi-schema" }],
   };
-  const [d] = signalsFrom(blocked, { nodes: NODES, recipe: "doc", runId: "run_1" });
+  const [d] = signalsFrom(blocked, {
+    nodes: NODES, recipe: "doc", runId: "run_1",
+    events: [{ kind: "escalation", task: "task_abc" }],
+  });
   assert.match(d.title, /kpi-schema/);
   assert.match(d.action, /인터뷰/);
   // It must not quote what the worker wrote. That is prose this module did not
@@ -133,10 +139,13 @@ test("an auto draft starts below a hand-written one", () => {
 });
 
 test("missing or malformed state does not throw", () => {
-  for (const bad of [undefined, {}, { dispatches: null, events: null },
-                     { dispatches: { d: {} }, events: [{}] }]) {
-    assert.doesNotThrow(() => signalsFrom(bad, { nodes: NODES, runId: "r" }));
+  for (const bad of [undefined, {}, { dispatches: null, tasks: null },
+                     { dispatches: { d: {} }, tasks: { t: {} } }]) {
+    assert.doesNotThrow(() => signalsFrom(bad, {
+      nodes: NODES, runId: "r", events: [{}, null, { kind: "escalation" }],
+    }));
   }
+  assert.doesNotThrow(() => signalsFrom({}, { nodes: NODES, events: "not an array" }));
 });
 
 // ------------------------------------------- the part that actually matters
@@ -145,15 +154,17 @@ test("every draft survives the gate that judges a human's lesson", () => {
   // the gate is loosened to admit them. This is the test that keeps both from
   // happening quietly.
   const state = {
+    tasks: { t1: { key: "kpi-schema" }, t2: { key: "render", attempts: 3 } },
     dispatches: {
       d1: { key: "kpi-schema", outcome: "succeeded", violations: ["src/other/thing.mjs"],
             filesModified: ["docs/kpi/a.md", "src/other/thing.mjs"] },
       d2: { key: "render", outcome: "succeeded", filesModified: ["src/render/a.mjs"] },
     },
-    events: [{ kind: "retry", key: "render" }, { kind: "retry", key: "render" },
-             { kind: "escalation", key: "kpi-schema" }],
   };
-  const drafts = signalsFrom(state, { nodes: NODES, recipe: "doc", runId: "run_1" });
+  const drafts = signalsFrom(state, {
+    nodes: NODES, recipe: "doc", runId: "run_1",
+    events: [{ kind: "escalation", task: "t1" }],
+  });
   assert.ok(drafts.length >= 3, `초안이 ${drafts.length}건뿐입니다`);
 
   for (const d of drafts) {

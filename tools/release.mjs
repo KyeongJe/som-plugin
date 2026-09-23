@@ -150,6 +150,23 @@ if (has("no-e2e")) {
   }
   const waves = (e2e.out.match(/^wave \d+/gm) ?? []).length;
   say(`  e2e  통과 · wave ${waves}개 · 터미널 누수 0`);
+
+  // The learning loop needs its own live run, because the scheduling e2e is
+  // deliberately clean and a clean run produces no patterns at all. Five
+  // separate links were broken while every unit test stayed green: nothing
+  // called propose(); signalsFrom read a `state.events` key that has never
+  // existed; events carry a task id and no node key; `filesModified` arrived
+  // empty because nothing asked the worker for it; and the router announced a
+  // scope violation without ever writing it down.
+  say("  learn 학습 루프를 실제 워커로 확인 중…");
+  const lrn = quiet("node", ["test/e2e-learning.mjs"], { cwd: SOM });
+  if (!lrn.ok || !/learning e2e PASSED/.test(lrn.out)) {
+    stop("학습 e2e 가 실패합니다", [
+      ...lrn.out.split("\n").filter((l) => /FAIL|ERROR/.test(l)).slice(0, 8),
+      "런이 끝나도 패턴이 쌓이지 않는다는 뜻입니다.",
+    ]);
+  }
+  say("  learn 통과 · 위반 관측 → 패턴 저장 → 다음 브리핑 주입");
 }
 
 // ------------------------------------------------------- 3. the file set

@@ -127,6 +127,16 @@ export class Router {
     const violations = this.checkWrites(declared, p.filesModified ?? []);
     if (violations.length) {
       this.store.event({ kind: "writes_violation", task: p.taskId, violations });
+      // Written onto the dispatch too, not only announced and returned. The
+      // line above scrolled past in the terminal and the finding died with it:
+      // the report read `d.violations`, `signalsFrom` read `d.violations`, and
+      // nothing ever put it there. A run that actually broke its write scope
+      // still finished with a clean record.
+      this.store.update((s) => {
+        const d = s.dispatches[p.dispatchId];
+        if (d) d.violations = violations;
+        return s;
+      });
       this.say(`주의: ${state.tasks?.[p.taskId]?.key ?? p.taskId} 가 선언 범위 밖 파일을 ` +
                `건드렸습니다 — ${violations.slice(0, 3).join(", ")}`);
     }

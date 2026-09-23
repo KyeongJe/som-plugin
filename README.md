@@ -310,7 +310,7 @@ Orca 를 쓸 때는 이 플러그인이 **스케줄링을 직접 합니다** —
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="som/docs/img/graph-tests-dark.svg">
-  <img alt="테스트 373건 전부 통과: 패턴 학습·자동 기록·스킬 승격 73건, SQL 분류·비용 리포트·쓰기 승인 55건, 모호도 게이트 52건, Orca 어댑터·효율·릴리스 게이트 45건, 우회 가드 32건, 자율 레벨·플로어 31건, IR 규칙과 golden 25건, 문서·매니페스트·공개 위생 22건, humanize 불변식 11건, 맨몸 설치·워크스루 11건, 스켈레톤·다이어그램 렌더 9건, 인터뷰와 라우팅 7건" src="som/docs/img/graph-tests-light.svg">
+  <img alt="테스트 383건 전부 통과: 패턴 학습·자동 기록·스킬 승격 73건, SQL 분류·비용 리포트·쓰기 승인 55건, 모호도 게이트 52건, Orca 어댑터·효율·릴리스 게이트 45건, 우회 가드 32건, 자율 레벨·플로어 31건, IR 규칙과 golden 25건, 문서·매니페스트·공개 위생 22건, humanize 불변식 11건, 맨몸 설치·워크스루 11건, 스켈레톤·다이어그램 렌더 9건, 인터뷰와 라우팅 7건" src="som/docs/img/graph-tests-light.svg">
 </picture>
 
 | 주장 | 어떻게 확인했나 | 결과 |
@@ -333,13 +333,14 @@ Orca 를 쓸 때는 이 플러그인이 **스케줄링을 직접 합니다** —
 node --test test/*.test.mjs                       # 240   (18개 파일)
 python engine/tests/test_write_path.py  # 28
 python engine/tests/test_ir.py          # 25
+python engine/tests/test_docx.py        # 10
 python engine/tests/test_somsql.py      # 27
 python engine/tests/test_manifest.py    # 22
 python engine/tests/test_humanize_io.py # 11
 python engine/tests/test_skeletons.py   #  6
 python engine/tests/test_diagrams.py    #  3
 python engine/tests/test_bare_install.py #  6
-python engine/tests/test_bare_walkthrough.py # 5   합계 373
+python engine/tests/test_bare_walkthrough.py # 5   합계 383
 python docs/check_counts.py                       # 위 숫자가 실측과 같은지
 node test/e2e-orca.mjs                            # 실제 워커 (유료)
 node test/e2e-conduct.mjs                         # 실제 워커 (유료)

@@ -415,6 +415,16 @@ export class Conduct {
       "folder; a human does that.",
       "- 이전 런에서 배운 것이 이 두 줄과 어긋나면 그 패턴이 틀린 것이다. " +
       "따르지 말고 그 사실을 보고하라.",
+      "",
+      // Nothing used to ask for this, and the whole write-scope guard depended
+      // on it. `commands.mjs` accepts `--files-modified`, `router.mjs` reads
+      // it and `checkWrites` compares it against the declared globs -- and the
+      // list arrived empty on every run ever made, so the comparison ran on
+      // nothing and reported no violation. The docs said a verifier checked
+      // declared scope against files actually touched. It never did.
+      "REPORT — worker_done 을 보낼 때 `--files-modified` 에 **실제로 만들거나 " +
+      "고친 파일 경로를 전부** 쉼표로 적어라. 위 SCOPE 밖의 파일을 건드렸다면 " +
+      "그것도 반드시 포함한다. 숨기는 것이 아니라 계획을 고치는 근거가 된다.",
     );
     if (node.notes) lines.push("", node.notes);
     return lines.join("\n");
@@ -465,8 +475,14 @@ export class Conduct {
    * operator works in general.
    */
   proposeFromRun(st, nodes, runId) {
+    // Events come from the store, not from `st`. They are appended to
+    // `.som/events.ndjson` and have never been part of the state object --
+    // which is why two of the three signals silently never fired until a live
+    // run showed it.
+    let events = [];
+    try { events = this.store.events(); } catch { /* advice, not a transaction */ }
     const drafts = signalsFrom(st, {
-      nodes: nodes ?? [], recipe: this.recipeId, runId,
+      nodes: nodes ?? [], recipe: this.recipeId, runId, events,
     });
     const stored = [];
     for (const d of drafts) {

@@ -101,7 +101,7 @@ def measure() -> dict:
         "bare": py("engine/tests/test_bare_install.py") + py("engine/tests/test_bare_walkthrough.py"),
         "skeletons": py("engine/tests/test_skeletons.py"),
         "diagrams": py("engine/tests/test_diagrams.py"),
-        "ir": py("engine/tests/test_ir.py"),
+        "ir": py("engine/tests/test_ir.py") + py("engine/tests/test_docx.py"),
         "humanize": py("engine/tests/test_humanize_io.py"),
         "somsql": py("engine/tests/test_somsql.py") + py("engine/tests/test_write_path.py"),
         "guards": node_group("guard.test.mjs", "sfguard*.test.mjs"),

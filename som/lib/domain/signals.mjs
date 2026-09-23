@@ -71,10 +71,22 @@ function triggersFor(node, recipe) {
  * `state` is the run record, `nodes` the plan. Returns drafts, not patterns --
  * the caller proposes them and the gate decides.
  */
-export function signalsFrom(state = {}, { nodes = [], recipe = "", runId = "" } = {}) {
+export function signalsFrom(state = {}, {
+  nodes = [], recipe = "", runId = "", events = [],
+} = {}) {
   const byKey = new Map(nodes.map((n) => [n.key, n]));
   const dispatches = Object.values(state?.dispatches ?? {});
-  const events = state?.events ?? [];
+  const tasks = state?.tasks ?? {};
+  // Events are passed in, never read off `state`. They live in
+  // `.som/events.ndjson`, and an earlier version of this module looked for
+  // `state.events` -- a key that has never existed. Two of the three signals
+  // below could not fire, and the unit tests missed it because they handed in
+  // a state object built by hand with an `events` array in it. The live run
+  // is what found it.
+  const log = Array.isArray(events) ? events : [];
+  // Events carry a task id; a pattern has to name the node. "task_143c6761ce82
+  // 는 사람에게 물어봐야 진행된다" tells the next plan nothing.
+  const keyOf = (e) => e?.key ?? tasks[e?.task]?.key ?? null;
   const drafts = [];
 
   const evidence = (extra = []) => {
@@ -114,11 +126,16 @@ export function signalsFrom(state = {}, { nodes = [], recipe = "", runId = "" } 
   // `repairPlan` already says at the third attempt that the task is too big.
   // Recording it turns that from advice inside one run into something the
   // next plan sees before it starts.
+  // `state.tasks[id].attempts` is the count the scheduler itself keeps, which
+  // is both simpler and more reliable than tallying events.
   const attemptsBy = new Map();
-  for (const e of events) {
+  for (const t of Object.values(tasks)) {
+    if (t?.key && Number(t.attempts) > 1) attemptsBy.set(t.key, Number(t.attempts) - 1);
+  }
+  for (const e of log) {
     if (e?.kind !== "retry" && e?.kind !== "worker_failed") continue;
-    const k = e.key ?? e.task;
-    if (k) attemptsBy.set(k, (attemptsBy.get(k) ?? 0) + 1);
+    const k = keyOf(e);
+    if (k && !attemptsBy.has(k)) attemptsBy.set(k, 1);
   }
   for (const [key, n] of attemptsBy) {
     if (n < 2) continue;                       // once is weather, twice is a pattern
@@ -147,8 +164,10 @@ export function signalsFrom(state = {}, { nodes = [], recipe = "", runId = "" } 
   // not repeat what the worker wrote, because that is prose this module did
   // not measure.
   const blocked = new Set();
-  for (const e of events) {
-    if (e?.kind === "escalation" && (e.key ?? e.task)) blocked.add(e.key ?? e.task);
+  for (const e of log) {
+    if (e?.kind !== "escalation") continue;
+    const k = keyOf(e);
+    if (k) blocked.add(k);
   }
   for (const key of blocked) {
     const node = byKey.get(key);

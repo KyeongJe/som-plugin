@@ -40,7 +40,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
 EMITTERS = ("html", "xlsx", "docx", "pptx")
-IMPLEMENTED = ("html", "xlsx")
+IMPLEMENTED = ("html", "xlsx", "docx")
 
 
 def _slug(ir: dict) -> str:
@@ -123,6 +123,18 @@ def cmd_build(a: argparse.Namespace) -> int:
         else:
             p = out_dir / f"{stem}.xlsx"
             xlsx_emitter.emit(ir, p)
+            written.append(p)
+    if "docx" in todo:
+        # Same contract as xlsx: a missing package is a capability this machine
+        # lacks, reported in the manifest, not a traceback after the HTML has
+        # already been written.
+        try:
+            from .emitters import docx as docx_emitter
+        except ImportError as e:
+            skipped_missing.append(("docx", "python-docx", str(e)))
+        else:
+            p = out_dir / f"{stem}.docx"
+            docx_emitter.emit(ir, p)
             written.append(p)
 
     # The bundle the skill documents is four things, and two of them were
@@ -260,7 +272,7 @@ def main(argv: list[str] | None = None) -> int:
 
     b = sub.add_parser("build", help="render the IR")
     b.add_argument("ir")
-    b.add_argument("--emit", default="html", help="comma separated: html,xlsx (docx,pptx 미구현)")
+    b.add_argument("--emit", default="html", help="comma separated: html,xlsx,docx (pptx 미구현)")
     b.add_argument("--no-manifest", action="store_true",
                    help="MANIFEST.json 과 ir/ 사본을 쓰지 않는다")
     b.add_argument("--out", help="output directory (default: alongside the IR)")

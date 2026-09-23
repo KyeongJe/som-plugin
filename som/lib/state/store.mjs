@@ -132,6 +132,31 @@ export class Store {
     }
   }
 
+  /**
+   * Read the events back.
+   *
+   * There was no reader, and that mattered the moment something wanted to
+   * learn from a run: `signalsFrom` looked for `state.events`, which has never
+   * existed -- events live only in this file. Two of its three signals could
+   * therefore never fire, and the unit tests missed it because they built the
+   * state object by hand with an `events` array in it.
+   *
+   * A torn line is skipped rather than thrown. This is an audit trail being
+   * read for advice, not a transaction log.
+   */
+  events() {
+    if (!existsSync(this.eventsPath)) return [];
+    let raw;
+    try { raw = readFileSync(this.eventsPath, "utf8"); } catch { return []; }
+    const out = [];
+    for (const line of raw.split("\n")) {
+      const t = line.trim();
+      if (!t) continue;
+      try { out.push(JSON.parse(t)); } catch { /* skip a torn line */ }
+    }
+    return out;
+  }
+
   /** Has the watcher been alive recently? The Stop hook asks this. */
   watcherFresh(maxAgeMs = 90_000) {
     const t = this.loop().lastKeepaliveAt;
