@@ -38,6 +38,14 @@ function spec(name, file) {
   return [
     `Write exactly the single line "${name} ok" into the file ${file}.`,
     `Create the parent directory if it does not exist. Do not create any other file.`,
+    // The assertion below has always demanded this and the spec never asked
+    // for it, so "every worker reported the file it modified" has been red
+    // since the day it was written -- unnoticed, because this e2e needs Orca
+    // and lives outside both the default suite and CI. The same omission in
+    // `Conduct.brief()` meant the write-scope guard never fired on any real
+    // run: checkWrites compared the declared globs against an empty list.
+    `When you send worker_done, put the full path of every file you created `
+    + `or changed in --files-modified.`,
     `Then report completion and stop. Do no other work.`,
   ].join(" ");
 }

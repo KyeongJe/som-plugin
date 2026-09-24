@@ -70,6 +70,23 @@ jobs:
       # in both directions -- deny outside the entrypoint, never block
       # unrelated work), the ambiguity gate, the pattern library, the autonomy
       # ledger. The live-worker e2e is not here; it needs Orca.
+      # A parser, because a regex cannot do this.
+      #
+      # `const pf = this.preflight()` was moved inside an `if` block and the
+      # two reads below it were left outside, so every parallel run died with
+      # `ReferenceError: pf is not defined` while all 373 tests stayed green.
+      # `Conduct.run()` has no unit test -- it needs Orca and paid workers --
+      # so nothing executed the line.
+      #
+      # no-undef finds that class without running anything. Verified against a
+      # copy of the original bug before this step was added: two errors, one
+      # per use site. A check nobody has seen fail proves nothing.
+      #
+      # eslint is a CI tool, not a plugin dependency. Nothing shipped in som/
+      # imports it and the plugin still installs with zero npm packages.
+      - name: No undefined references
+        run: npx --yes eslint@9 -c eslint.config.mjs som/lib som/bin som/scripts som/monitors som/test tools
+
       - name: Node engine
         working-directory: som
         run: node --test test/*.test.mjs

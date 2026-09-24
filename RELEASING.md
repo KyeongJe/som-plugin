@@ -47,7 +47,10 @@ node tools/release.mjs 0.2.0 --public ../som-plugin --push
 | 테스트 | node 전체 · python 전체. 하나라도 실패하면 중단 |
 | 발행된 숫자 | README 의 테스트 개수 = 실측 |
 | doctor | fail 0 |
+| **lint (no-undef)** | 실제 파서. `pf is not defined` 같은 스코프 결함을 실행 없이 잡습니다 |
 | **오케스트레이션 e2e** | 실제 워커로 `Conduct.run()` 실행. 단위 테스트가 안 건드리는 유일한 핵심 경로입니다 |
+| **학습 e2e** | 위반 관측 → 패턴 저장 → 다음 브리핑 주입까지 실제로 도는지 |
+| **Orca 어댑터 e2e** | worker_done 정산 · 터미널 회수 |
 | **공개 위생** | 실제 account identifier · 접속 endpoint · private key 본문 · 개발자 홈 경로 · 매니페스트 밖으로 샌 이메일 |
 | 포함 파일 | `.som/` · `_cache/` · `*.jsonl` · `*.parquet` · 키 파일 등이 섞였는지 |
 | 버전 | plugin.json · marketplace.json 2곳, 3개가 전부 같은지 |
@@ -60,6 +63,15 @@ node tools/release.mjs 0.2.0 --public ../som-plugin --push
 손으로 돌려서 찾았는데, 손은 장치가 아닙니다. 그래서 여기 있습니다.
 
 Orca 가 없는 머신이면 `--no-e2e` 로 건너뛸 수 있지만, **건너뛰었다고 출력에 찍힙니다.**
+
+**썩은 e2e 가 실제로 있었습니다.** `e2e-orca.mjs` 는 "모든 워커가 고친 파일을
+보고한다"를 **작성된 날부터 단언했고 그날부터 실패하고 있었습니다** — 자기 spec 이
+워커에게 그 목록을 요구하지 않았거든요. Orca 가 필요해서 기본 스위트에도 CI 에도
+없으니 아무도 안 돌렸습니다. 그 사이 같은 누락이 `Conduct.brief()` 에도 있어서
+선언 밖 쓰기 가드가 한 번도 발화하지 못했습니다.
+
+**아무도 안 돌리는 빨간 테스트는 테스트가 없는 것과 같고, 게다가 커버리지처럼
+보입니다.** 그래서 셋 다 게이트에 있습니다.
 
 공개 위생 검사는 `tools/gate.mjs` 이고 `som/test/release.test.mjs` 가 검사합니다 —
 막아야 할 것과 막으면 안 되는 것을 짝으로 둡니다. **오탐이 있는 게이트는

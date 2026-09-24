@@ -167,6 +167,20 @@ if (has("no-e2e")) {
     ]);
   }
   say("  learn 통과 · 위반 관측 → 패턴 저장 → 다음 브리핑 주입");
+
+  // The adapter layer, and the cautionary tale of this whole set. This e2e
+  // asserted "every worker reported the file it modified" from the day it was
+  // written, and had been failing that check ever since -- its own spec never
+  // asked the worker for the list. Nobody saw it, because it needs Orca and
+  // sits outside both the default suite and CI. A red test nobody runs is the
+  // same as no test, except it also looks like coverage.
+  say("  orca 어댑터·수명주기 확인 중…");
+  const orca = quiet("node", ["test/e2e-orca.mjs"], { cwd: SOM });
+  if (!orca.ok || !/^e2e PASSED$/m.test(orca.out)) {
+    stop("Orca 어댑터 e2e 가 실패합니다",
+         orca.out.split("\n").filter((l) => /FAIL|ERROR/.test(l)).slice(0, 8));
+  }
+  say("  orca 통과 · worker_done 정산 · 터미널 회수");
 }
 
 // ------------------------------------------------------- 3. the file set
